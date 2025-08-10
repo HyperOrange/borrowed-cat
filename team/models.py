@@ -1,19 +1,27 @@
-# MyTeamPlanner/myteam_planner/team/models.py
-
+# team/models.py
 from django.db import models
-import uuid # 고유 URL 토큰 생성을 위해 uuid 모듈 임포트
+import uuid
 
 class Team(models.Model):
     team_name = models.CharField(max_length=100)
-    # DateField -> DateTimeField로 변경하여 시간까지 저장할 수 있도록 함
-    team_period_start = models.DateTimeField(null=True, blank=True)
-    team_period_end = models.DateTimeField(null=True, blank=True)
-    unique_url_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    team_period_start = models.DateField(null=True, blank=True)
+    team_period_end = models.DateField(null=True, blank=True)
+    # 공유용 토큰 (URL에 쓰는 값)
+    unique_url_token = models.CharField(max_length=36, unique=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.unique_url_token:
+            self.unique_url_token = str(uuid.uuid4())
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.team_name
+        return f"{self.team_name}"
 
-    class Meta:
-        db_table = 'team'
-        ordering = ['-created_at']
+class TeamMember(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="members")
+    nickname = models.CharField(max_length=50)
+    # 선택: 키워드 문자열 저장. 나중에 JSONField로 바꿔도 됨
+    keywords = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return f"{self.nickname} ({self.team.team_name})"

@@ -5,5 +5,5 @@ from . import views # 현재 앱의 views.py 임포트
 
 urlpatterns = [
     # team_token을 받아 메인 페이지를 보여주는 URL
-    path('<uuid:team_token>/', views.main_page_view, name='main_page'),
+    path('<str:team_token>/', views.main_page_view, name='main_page'),
 ]

@@ -1,0 +1,6 @@
+{% load static %}
+{% comment %} base.html 상속 안 쓰면 그냥 여기에 넣어도 됩니다 {% endcomment %}
+
+<link rel="stylesheet" href="{% static 'todo_list/css/anima.css' %}">
+<!-- 폰트가 구글폰트면 Anima가 준 <link>를 그대로 유지 -->
+<!-- 로컬 폰트면 css에서 url('{% static "todo_list/fonts/파일.woff2" %}') 로 수정 -->
