@@ -130,3 +130,14 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ... (기존 설정 코드) ...
+
+STATICFILES_DIRS = [
+    # 이 부분을 수정하여 프로젝트 루트의 static 폴더를 추가합니다.
+    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'role_distribution/static'),
+    # 다른 앱의 static 폴더도 필요에 따라 추가할 수 있습니다.
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

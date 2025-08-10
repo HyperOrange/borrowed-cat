@@ -1,3 +1,4 @@
 from django.shortcuts import render
 
-# Create your views here.
+def role_distribution_view(request):
+    return render(request, 'role_distribution/index.html')
