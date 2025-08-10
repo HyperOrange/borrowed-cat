@@ -1,36 +1,48 @@
-# MyTeamPlanner/myteam_planner/core/views.py
-
 from django.shortcuts import render, redirect
-from team.models import Team # team 앱의 Team 모델 임포트
-from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt # CSRF 보호 비활성화 (개발용, 배포 시 제거 또는 적절히 처리)
+from team.models import Team # Team 모델을 import 합니다.
 
-# 첫 페이지 (시작하기 버튼)
-def index_view(request):
+# 첫 페이지(시작 페이지)를 렌더링하는 뷰 함수입니다.
+def index(request):
     return render(request, 'core/index.html')
 
-# 팀명 입력 및 처리 페이지 (Activity Views)
-@csrf_exempt # 임시로 CSRF 보호 비활성화 (보안 취약점, 나중에 Form 활용 시 제거)
-def create_team_view(request):
+# 팀명 입력 페이지를 렌더링하고, POST 요청 시 팀명을 처리하는 뷰 함수입니다.
+def create_team(request):
     if request.method == 'POST':
-        team_name = request.POST.get('team_name') # 'team_name' 이라는 이름의 input에서 값 가져오기
-
+        # POST 요청일 경우, 폼에서 팀명 데이터를 가져옵니다.
+        team_name = request.POST.get('team_name')
         if team_name:
-            # Team 모델에 새로운 팀 생성 및 저장
-            new_team = Team.objects.create(team_name=team_name)
-            # 팀 생성 후, 팀플 기간 설정 페이지로 리다이렉트
-            # 'set_period'는 set_period_view에 연결될 URL 패턴의 이름 (뒤에서 정의)
-            return redirect(reverse('set_period', kwargs={'team_token': new_team.unique_url_token}))
-        else:
-            # 팀명이 입력되지 않았을 경우, 에러 메시지와 함께 다시 렌더링
-            return render(request, 'core/create_team.html', {'error': '팀명을 입력해주세요.'})
+            # 팀명이 정상적으로 입력되면 다음 페이지로 리다이렉트합니다.
+            return redirect('set_deadline')
     
-    # GET 요청 (시작하기 버튼 누른 후 처음 진입 시)
+    # GET 요청이거나 폼 데이터가 유효하지 않을 경우, 페이지를 다시 렌더링합니다.
     return render(request, 'core/create_team.html')
 
-# 팀플 설정 기간 페이지 (간단하게만 구현)
-def set_period_view(request, team_token):
-    # team_token을 사용하여 해당 팀 객체를 가져올 수 있습니다.
-    # 하지만 이 단계에서는 단순히 페이지를 렌더링만 합니다.
-    # 실제 구현에서는 여기서 달력 API 연동 및 기간 저장 로직이 추가됩니다.
-    return render(request, 'team/set_period.html', {'team_token': team_token})
+# 팀플 기간 설정 페이지를 렌더링하고, POST 요청 시 마감일을 처리하는 뷰 함수입니다.
+def set_deadline(request):
+    if request.method == 'POST':
+        # 세션에서 team_id를 가져옵니다.
+        team_id = request.session.get('team_id')
+        if team_id:
+            try:
+                team = Team.objects.get(team_id=team_id)
+                deadline_date = request.POST.get('deadline_date')
+                deadline_time = request.POST.get('deadline_time')
+
+                # 팀 객체에 마감일과 시간을 저장합니다.
+                team.deadline_date = deadline_date
+                team.deadline_time = deadline_time
+                team.save()
+
+                # 데이터 저장이 완료되면 메인 페이지로 리다이렉트합니다.
+                # 아직 메인 페이지가 없으므로 임시로 'index' 페이지로 리다이렉트합니다.
+                return redirect('index') 
+            except Team.DoesNotExist:
+                # 팀 객체가 없는 경우 에러 처리
+                return redirect('index') 
+    
+    return render(request, 'core/set_deadline.html')
+
+# 임시로 메인 페이지를 렌더링하는 뷰 함수입니다.
+# 메인 페이지 프론트엔드 작업이 완료되면 이 함수를 보강할 예정입니다.
+def main_page(request, team_id):
+    return render(request, 'team/main_page.html')

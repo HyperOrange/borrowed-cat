@@ -1,11 +1,11 @@
-# MyTeamPlanner/myteam_planner/core/urls.py
-
 from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.index_view, name='index'),
-    # 이 부분이 중요합니다! 'name'이 'create_team_ajax'로 정확히 정의되었는지 확인하세요.
-    path('create-ajax/', views.create_team_ajax_view, name='create_team_ajax'),
-    path('set-period/<uuid:team_token>/', views.set_period_view, name='set_period'),
+    # 최상위 경로('/')에 views.py의 index 함수를 연결합니다.
+    path('', views.index, name='index'),
+    # 'create-team/' 경로에 views.py의 create_team 함수를 연결합니다.
+    path('create-team/', views.create_team, name='create_team'),
+    # 'set-deadline/' 경로에 views.py의 set_deadline 함수를 연결합니다.
+    path('set-deadline/', views.set_deadline, name='set_deadline'),
 ]

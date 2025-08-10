@@ -1,68 +1,21 @@
-# MyTeamPlanner/myteam_planner/core/views.py
+from django.shortcuts import render, redirect
 
-from django.shortcuts import render, redirect, get_object_or_404
-from team.models import Team
-from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse, HttpResponse # JsonResponse, HttpResponse 임포트
-from datetime import datetime
-import json # JSON 데이터 파싱을 위해 임포트
-
-# 첫 페이지 (시작하기 버튼 및 모달 포함)
-def index_view(request):
+# 첫 페이지(시작 페이지)를 렌더링하는 뷰 함수입니다.
+def index(request):
     return render(request, 'core/index.html')
 
-# 팀명 입력 처리 (AJAX 요청 처리)
-# 이제 이 뷰는 HTTP POST 요청만 받고, JSON 응답을 보냅니다.
-@csrf_exempt # 임시로 CSRF 보호 비활성화 (보안 취약점, 배포 시 Form 사용 및 제거)
-def create_team_ajax_view(request):
+# 팀명 입력 페이지를 렌더링하고, POST 요청 시 팀명을 처리하는 뷰 함수입니다.
+def create_team(request):
     if request.method == 'POST':
-        try:
-            # 클라이언트에서 JSON 형식으로 데이터를 보낼 것이므로, request.body에서 파싱
-            data = json.loads(request.body)
-            team_name = data.get('team_name')
-
-            if team_name:
-                new_team = Team.objects.create(team_name=team_name)
-                # 성공 시, 생성된 팀의 메인 페이지 URL을 반환
-                main_page_url = reverse('set_period', kwargs={'team_token': new_team.unique_url_token})
-                return JsonResponse({'status': 'success', 'redirect_url': main_page_url})
-            else:
-                return JsonResponse({'status': 'error', 'message': '팀명을 입력해주세요.'}, status=400)
-        except json.JSONDecodeError:
-            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+        # POST 요청일 경우, 폼에서 팀명 데이터를 가져옵니다.
+        team_name = request.POST.get('team_name')
+        if team_name:
+            # 팀명이 정상적으로 입력되면 다음 페이지로 리다이렉트합니다.
+            return redirect('set_deadline')
     
-    # GET 요청은 허용하지 않음 (이 뷰는 AJAX POST 전용)
-    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+    # GET 요청이거나 폼 데이터가 유효하지 않을 경우, 페이지를 다시 렌더링합니다.
+    return render(request, 'core/create_team.html')
 
-
-# 팀플 설정 기간 페이지 (이전과 동일)
-@csrf_exempt
-def set_period_view(request, team_token):
-    team = get_object_or_404(Team, unique_url_token=team_token)
-
-    if request.method == 'POST':
-        try:
-            start_date_str = request.POST.get('start_date')
-            start_time_str = request.POST.get('start_time')
-            end_date_str = request.POST.get('end_date')
-            end_time_str = request.POST.get('end_time')
-
-            start_datetime_str = f"{start_date_str} {start_time_str}"
-            end_datetime_str = f"{end_date_str} {end_time_str}"
-
-            team.team_period_start = datetime.strptime(start_datetime_str, "%Y-%m-%d %H:%M")
-            team.team_period_end = datetime.strptime(end_datetime_str, "%Y-%m-%d %H:%M")
-            team.save()
-
-            return redirect(reverse('main_page', kwargs={'team_token': team.unique_url_token}))
-
-        except (ValueError, TypeError):
-            return render(request, 'team/set_period.html', {
-                'team_token': team_token,
-                'error': '날짜와 시간을 올바르게 입력해주세요.'
-            })
-    
-    return render(request, 'team/set_period.html', {'team_token': team_token})
+# 팀플 기간 설정 페이지를 렌더링하는 뷰 함수입니다.
+def set_deadline(request):
+    return render(request, 'core/set_deadline.html')

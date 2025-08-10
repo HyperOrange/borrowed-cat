@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}팀플 기간 설정{% endblock %}
+
+{% block head %}
+    <!-- Vanilla Calendar CSS v2.7.0 (unpkg CDN으로 변경) -->
+    <link href="https://unpkg.com/vanilla-calendar@2.7.0/dist/vanilla-calendar.min.css" rel="stylesheet">
+    <!-- Picker.js CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/pickerjs@1.2.0/dist/picker.min.css" rel="stylesheet">
+
+    <style>
+        /* CSS를 여기에 직접 포함하여 외부 파일 로딩 문제 방지 */
+        /* 전체 레이아웃 (모바일 중심) */
+        .date-setting-container { 
+            padding: 20px; 
+            max-width: 480px; 
+            margin: 0 auto; 
+            box-sizing: border-box; 
+        }
+        .page-header { 
+            margin-bottom: 12px; 
+        }
+        .page-title { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: #222; 
+        }
+
+        /* 달력 영역 - 반드시 min-height로 렌더 공간 확보 */
+        .calendar-container { 
+            margin: 12px 0 20px; 
+            display:flex; 
+            justify-content:center; 
+        }
+        #date-picker {
+            width: 100%;
+            max-width: 420px;
+            min-height: 320px;    /* 중요: 달력 렌더링 영역 확보 */
+            box-sizing: border-box;
+            padding: 10px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+        }
+
+        /* 시간 선택 및 레이블 */
+        .time-picker-container { 
+            text-align:center; 
+            margin-top:6px; 
+            margin-bottom:18px; 
+        }
+        .time-picker-title { 
+            color:#666; 
+            margin-bottom:8px; 
+        }
+        .time-picker-wrapper { 
+            display:flex; 
+            justify-content:center; 
+            align-items:center; 
+            gap:8px; 
+        }
+        .time-input { 
+            width:120px; 
+            padding:10px 12px; 
+            border-radius:10px; 
+            border:1px solid #eee; 
+            text-align:center; 
+            font-size:16px; 
+        }
+
+        /* 시작 버튼 - 너비 넉넉히 */
+        .start-button {
+            display:block;
+            width:92%;
+            max-width:520px;
+            min-width:260px;
+            margin: 12px auto 24px;
+            padding:14px 18px;
+            background:#f4c043;
+            color:#fff;
+            border:none;
+            border-radius:34px;
+            font-weight:800;
+            font-size:18px;
+            text-align:center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            white-space:nowrap;
+        }
+
+        @media (max-width:420px) {
+            #date-picker { min-height:300px; }
+            .start-button { min-width: 200px; width:95%; font-size:16px; }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="date-setting-container">
+        <header class="page-header">
+            <h1 class="page-title">팀플 기간 설정</h1>
+        </header>
+
+        <form action="{% url 'set_deadline' %}" method="post" id="deadline-form">
+            {% csrf_token %}
+            <div class="calendar-container">
+                <div id="date-picker" aria-label="달력 선택 영역"></div>
+                <input type="hidden" name="deadline_date" id="selected-date-input">
+            </div>
+
+            <div class="time-picker-container">
+                <div class="time-picker-title">마감 시간 설정</div>
+                <div class="time-picker-wrapper">
+                    <input type="text" id="end-time-picker" name="deadline_time" class="time-input" placeholder="18:00" autocomplete="off">
+                    <span class="time-separator">까지</span>
+                </div>
+            </div>
+
+            <button type="submit" class="start-button">빌려온 고양이 시작!</button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <!-- JS: 안정적인 IIFE 빌드(전역 VanillaCalendar 제공) -->
+    <script src="https://unpkg.com/vanilla-calendar@2.7.0/dist/vanilla-calendar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pickerjs@1.2.0/dist/picker.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 라이브러리 로드 확인
+            if (typeof VanillaCalendar === 'undefined') {
+                console.error('VanillaCalendar가 로드되지 않았습니다. 네트워크 또는 CDN 차단을 확인하세요.');
+                return;
+            }
+
+            // 옵션 및 클릭 이벤트
+            const options = {
+                settings: {
+                    selection: { day: 'single' }
+                },
+                actions: {
+                    clickDay: function(event, dates) {
+                        if (dates && dates[0]) {
+                            document.getElementById('selected-date-input').value = dates[0];
+                            console.log('선택한 날짜:', dates[0]);
+                        }
+                    }
+                }
+            };
+
+            // 여러 초기화 시그니처에 대비 (v2.x 호환성 확보)
+            let calendar = null;
+            try {
+                // 시도 1: selector 문자열 전달 방식
+                calendar = new VanillaCalendar('#date-picker', options);
+            } catch (err1) {
+                try {
+                    // 시도 2: 객체 방식 (element 프로퍼티)
+                    const optsWithElement = Object.assign({ element: document.querySelector('#date-picker') }, options);
+                    calendar = new VanillaCalendar(optsWithElement);
+                } catch (err2) {
+                    console.error('VanillaCalendar 초기화 실패:', err1, err2);
+                }
+            }
+
+            // init()가 있으면 호출 (2.x에서 필요)
+            if (calendar && typeof calendar.init === 'function') {
+                try { calendar.init(); } catch (e) { console.warn('calendar.init() 호출 중 경고:', e); }
+            }
+
+            // Picker.js 초기화 (시간 선택)
+            const endTimeInput = document.getElementById('end-time-picker');
+            try {
+                new Picker(endTimeInput, {
+                    format: 'HH:mm',
+                    text: { title: '시간 선택' },
+                    controls: true
+                });
+            } catch (e) {
+                console.error('Picker 초기화 오류:', e);
+            }
+        });
+    </script>
+{% endblock %}

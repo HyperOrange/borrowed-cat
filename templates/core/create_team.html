@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}팀명 입력{% endblock %}
+
+{% block content %}
+    <div class="intro-container">
+        <img src="{% static 'img/intro_background.jpg' %}" alt="서비스 소개 이미지" class="intro-background">
+        
+        <div class="activity-view-container">
+            <div class="activity-view-header">
+                <h2 class="activity-view-title">어떤 팀플이냥?</h2>
+            </div>
+            
+            <form action="{% url 'create_team' %}" method="post">
+                {% csrf_token %}
+                <div class="team-type-buttons">
+                    <button type="button" class="type-button">전공</button>
+                    <button type="button" class="type-button">교양</button>
+                    <button type="button" class="type-button">동아리</button>
+                    <button type="button" class="type-button">기타</button>
+                </div>
+
+                <div class="form-section">
+                    <label for="team-name" class="input-label">팀명을 입력해줘</label>
+                    <input type="text" id="team-name" name="team_name" class="text-input" placeholder="빌려온 고양이">
+                </div>
+
+                <button type="submit" class="next-button">확인</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
