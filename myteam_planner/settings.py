@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',  # core 앱 추가
     'team',  # team 앱 추가
+    'todo_list', # todo_list 앱 추가
 ]
 
 MIDDLEWARE = [

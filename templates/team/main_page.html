@@ -1,125 +1,58 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>메인 페이지</title>
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f4f4f4;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
-            position: relative;
-        }
-        .iphone-frame {
-            width: 390px;
-            height: 844px;
-            border: 10px solid #333;
-            border-radius: 40px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #fff;
-            position: relative;
-            overflow: hidden;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .header {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        .header h1 {
-            color: #333;
-            font-size: 1.8em;
-            margin-bottom: 10px;
-        }
-        .progress-bar-container {
-            width: 80%;
-            background-color: #e0e0e0;
-            border-radius: 10px;
-            height: 20px;
-            overflow: hidden;
-        }
-        .progress-bar {
-            height: 100%;
-            /* 여기를 변경: width 속성을 CSS에서 제거하고 JS로 동적으로 설정 */
-            background-color: #4CAF50;
-            border-radius: 10px;
-            transition: width 0.5s ease-in-out;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-        .main-content {
-            flex-grow: 1;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #666;
-            font-size: 1.2em;
-        }
-        .url-share-button {
-            padding: 10px 20px;
-            font-size: 1em;
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div class="iphone-frame">
-        <div class="header">
-            <button class="url-share-button" onclick="copyToClipboard('{{ request.build_absolute_uri }}')">
-                링크 공유하기
-            </button>
-            <h1>{{ team_name }}</h1>
-            <div class="progress-bar-container">
-                <div id="progressBar" class="progress-bar">{{ progress }}%</div>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}팀플 관리{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- 아이콘을 위한 Font Awesome 라이브러리 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+    <div class="main-container">
+        <header class="main-header">
+            <!-- 팀명 및 링크 공유 버튼 -->
+            <div class="team-info">
+                <!-- views.py에서 전달받은 팀명을 여기에 동적으로 표시 -->
+                <span class="team-name">{{ team.team_name }}</span>
+            </div>
+            <div class="header-actions">
+                <button class="share-button-bg">
+                    <i class="fas fa-link"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- 진행률 바 (초기 0%) -->
+        <div class="progress-bar-container">
+            <div class="progress-bar" style="width: 0%;"></div>
+            <span class="progress-text">0%</span>
+        </div>
+
+        <!-- 팀원 리스트 컨테이너 (스크롤 가능) -->
+        <div class="member-list-container">
+            <!-- 팀원 리스트는 처음에는 비어 있음. -->
+
+            <!-- 팀원 추가 버튼만 존재 -->
+            <div class="member-item add-member">
+                <div class="member-profile add-button-circle">
+                    <i class="fas fa-plus add-icon"></i>
+                </div>
+                <div class="member-role-box add-member-text">
+                    <span class="member-role-text">팀원으로 참가하기</span>
+                </div>
             </div>
         </div>
-        
-        <div class="main-content">
-            <p>메인 페이지 기능들이 여기에 들어갑니다.</p>
+
+        <!-- 하단 버튼들 -->
+        <div class="button-grid">
+            <a href="{% url 'todo_list:list' team_id=team.team_id %}" class="grid-button">To-Do list</a>
+            <button class="grid-button">스케줄 확인하기</button>
+            <button class="grid-button">역할 설정하기</button>
+            <button class="grid-button">D-day</button>
+            <button class="grid-button">when2meet</button>
+            <button class="grid-button">링크 모음</button>
         </div>
     </div>
-
-    <script>
-        // 클립보드 복사 함수는 그대로 유지
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(function() {
-                alert('링크가 클립보드에 복사되었습니다!');
-            }, function(err) {
-                console.error('클립보드 복사 실패:', err);
-                alert('링크 복사에 실패했습니다.');
-            });
-        }
-
-        // JavaScript를 사용하여 프로그레스 바 너비를 설정
-        document.addEventListener('DOMContentLoaded', function() {
-            var progressBar = document.getElementById('progressBar');
-            // Django 템플릿 변수를 JavaScript 변수로 가져옵니다.
-            var progressValue = {{ progress }}; 
-            progressBar.style.width = progressValue + '%';
-        });
-    </script>
-</body>
-</html>
+{% endblock %}

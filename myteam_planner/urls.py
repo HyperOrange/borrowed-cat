@@ -8,6 +8,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
+    path('todo/', include('todo_list.urls')),
 ]
 
 # 개발 환경에서 정적 파일을 서빙하기 위한 설정입니다.

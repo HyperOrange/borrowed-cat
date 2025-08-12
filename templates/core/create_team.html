@@ -14,12 +14,7 @@
             
             <form action="{% url 'create_team' %}" method="post">
                 {% csrf_token %}
-                <div class="team-type-buttons">
-                    <button type="button" class="type-button">전공</button>
-                    <button type="button" class="type-button">교양</button>
-                    <button type="button" class="type-button">동아리</button>
-                    <button type="button" class="type-button">기타</button>
-                </div>
+                <!-- 전공/교양/동아리/기타 버튼 블록을 삭제했습니다. -->
 
                 <div class="form-section">
                     <label for="team-name" class="input-label">팀명을 입력해줘</label>
