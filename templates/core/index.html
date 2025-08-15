@@ -13,8 +13,8 @@
         <!-- 이미지에 텍스트가 포함되어 있으므로, HTML에서는 별도의 텍스트를 추가하지 않습니다. -->
         <img src="{% static 'img/intro_background.jpg' %}" alt="서비스 소개 이미지" class="intro-background">
         
-        <!-- 하단에 시작하기 버튼만 배치합니다. -->
-        <a href="{% url 'create_team' %}" class="start-button">빌려온 고양이 시작하기</a>
+        <!-- URL 호출 시 'core' 앱의 'create_team'을 명시합니다. -->
+        <a href="{% url 'core:create_team' %}" class="start-button">빌려온 고양이 시작하기</a>
     </div>
 </body>
 </html>

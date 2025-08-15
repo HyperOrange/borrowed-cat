@@ -1,83 +1,64 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="ko">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-    <!-- Pretendard -->
+{% block title %}할 일 목록{% endblock %}
+
+{% block head %}
+    <!-- 폰트 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
-
     <!-- Anima CSS (정적 경로) -->
     <link rel="stylesheet" href="{% static 'todo_list/css/globals.css' %}" />
     <link rel="stylesheet" href="{% static 'todo_list/css/styleguide.css' %}" />
     <link rel="stylesheet" href="{% static 'todo_list/css/style.css' %}" />
 
     <style>
-      /* 모바일웹 컨테이너 */
-      .app {
-        max-width: 414px;
-        margin: 0 auto;
-        min-height: 100dvh;
-        padding: max(12px, env(safe-area-inset-top)) 16px max(12px, env(safe-area-inset-bottom));
-        background: #fff;
-        font-family: Pretendard, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif;
-      }
-      img { max-width: 100%; height: auto; }
-      /* 상단 헤더 정렬 보정 */
-      .frame { display:flex; align-items:center; gap:8px; padding:8px 0; }
-      .frame .div { font-weight:700; font-size:20px; }
-      .icon-chevron-left { display:inline-flex; width:24px; height:24px; }
-      .indicator { padding:8px 0; }
+        /* 모바일웹 컨테이너 */
+        .app {
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100dvh;
+            padding: max(12px, env(safe-area-inset-top)) 16px max(12px, env(safe-area-inset-bottom));
+            background: #fff;
+            font-family: Pretendard, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif;
+        }
+        img { max-width: 100%; height: auto; }
+        /* 상단 헤더 정렬 보정 */
+        .frame { display:flex; align-items:center; gap:8px; padding:8px 0; }
+        .frame .div { font-weight:700; font-size:20px; }
+        .icon-chevron-left { display:inline-flex; width:24px; height:24px; }
+        .indicator { padding:8px 0; }
     </style>
-  </head>
-  <body>
+{% endblock %}
+
+{% block content %}
     <main class="app">
-      <!-- 상단 헤더 (system-bar 제거됨) -->
-      <div class="frame">
-        <!-- 뒤로가기 필요 없으면 이 a 태그 지워도 됨 -->
-        <a class="icon-chevron-left" href="{% url 'core:index' %}" aria-label="뒤로가기">
-          <img class="vector" src="{% static 'todo_list/img/vector.svg' %}" alt="back" />
+        <!-- 상단 헤더 -->
+        <div class="frame">
+            <a class="icon-chevron-left" href="{% url 'main_page' team_id=team_id %}" aria-label="뒤로가기">
+                <img class="vector" src="{% static 'todo_list/img/vector.svg' %}" alt="back" />
+            </a>
+            <div class="div">To -Do list</div>
+        </div>
+
+        <div class="indicator"><div class="line"></div></div>
+
+        <!-- 목록 -->
+        <section aria-label="Todo items">
+            <!-- todo items will be rendered here -->
+            {% for todo in todos %}
+            <div class="overlap-2">
+                <p class="text-wrapper-2">[{{ todo.title }}]<br />맡은이: {{ todo.assignee }}<br />마감일: {{ todo.due_date }}</p>
+                <img class="img" src="{% static 'todo_list/img/rectangle-4208.svg' %}" alt="" />
+                <img class="image" src="{% static 'todo_list/img/image-61.png' %}" alt="" />
+            </div>
+            {% empty %}
+            <p>할 일이 없습니다. 새로운 할 일을 추가해주세요.</p>
+            {% endfor %}
+        </section>
+
+        <!-- + 버튼: 신규 추가 페이지로 이동 -->
+        <a class="group" href="{% url 'todo_list:add' team_id=team_id %}" aria-label="할 일 추가">
+            <div class="div-wrapper"><div class="text-wrapper-3">+</div></div>
         </a>
-        <div class="div">To -Do list</div>
-      </div>
-
-      <div class="indicator"><div class="line"></div></div>
-
-      <!-- 목록(지금은 하드코드 예시; 나중에 {% for t in todos %}로 교체) -->
-      <section aria-label="Todo items">
-        <div class="overlap-2">
-          <p class="text-wrapper-2">[자료 조사]<br />맡은이: 기계 고양<br />D - 15</p>
-          <img class="img" src="{% static 'todo_list/img/rectangle-4208.svg' %}" alt="" />
-          <img class="rectangle-2" src="{% static 'todo_list/img/rectangle-4213.svg' %}" alt="" />
-          <img class="image" src="{% static 'todo_list/img/image-61.png' %}" alt="" />
-        </div>
-
-        <div class="overlap-3">
-          <p class="text-wrapper-2">[발표자료 제작]<br />맡은이: 곱슬 고양 <br />마감일:</p>
-          <img class="img" src="{% static 'todo_list/img/rectangle-4209.svg' %}" alt="" />
-        </div>
-
-        <div class="overlap-4">
-          <div class="text-wrapper-2">[리포트 작성]<br />맡은이: 멍멍 고양<br />마감일:</div>
-          <img class="img" src="{% static 'todo_list/img/rectangle-4210.svg' %}" alt="" />
-        </div>
-
-        <div class="overlap-5">
-          <div class="text-wrapper-2">[리포트 제출]<br />맡은이: 일산 고양<br />마감일:</div>
-          <img class="rectangle-3" src="{% static 'todo_list/img/rectangle-4211.svg' %}" alt="" />
-        </div>
-
-        <div class="overlap-6">
-          <div class="text-wrapper-2">[발표]<br />맡은이: 야옹 고양<br />마감일:</div>
-          <img class="rectangle-4" src="{% static 'todo_list/img/rectangle-4212.svg' %}" alt="" />
-        </div>
-      </section>
-
-      <!-- + 버튼: 신규 추가 페이지로 이동 -->
-      <a class="group" href="{% url 'todo:new' team_token=team_token %}" aria-label="할 일 추가">
-        <div class="div-wrapper"><div class="text-wrapper-3">+</div></div>
-      </a>
     </main>
-  </body>
-</html>
+{% endblock %}

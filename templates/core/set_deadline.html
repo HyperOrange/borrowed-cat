@@ -1,193 +1,303 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}팀플 마감일 설정{% endblock %}
+
 {% block head %}
-<link href="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro/styles/index.css" rel="stylesheet">
-<style>
-    /* 달력 위 공간 줄이기 */
-    .date-setting-container {
-        padding: 20px;
-        max-width: 480px;
-        margin: 0 auto;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-    }
-    
-    .page-header { 
-        margin-bottom: 20px; 
-        flex-shrink: 0; /* 헤더 크기 고정 */
-    }
-    
-    .page-title { 
-        font-size: 24px; 
-        font-weight: 700; 
-        color: #222; 
-    }
-    
-    /* 중앙 컨텐츠 영역 */
-    .content-center {
-        flex: 1; /* 남은 공간 모두 차지 */
-        display: flex;
-        flex-direction: column;
-        justify-content: center; /* 수직 중앙 정렬 */
-        align-items: center; /* 수평 중앙 정렬 */
-        gap: 30px; /* 날짜와 시간 선택 사이 간격 */
-        padding: 20px 0;
-    }
-    
-    .calendar-container {
-        width: 100%;
-        max-width: 350px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .time-picker-container {
-        width: 100%;
-        max-width: 350px;
-        text-align: center;
-    }
-    
-    .time-picker-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
-    
-    .time-input {
-        padding: 12px;
-        font-size: 16px;
-        width: 120px;
-        border: 2px solid #ddd;
-        border-radius: 8px;
-        background: white;
-    }
-    
-    .time-separator { 
-        font-size: 16px; 
-        color: #666; 
-    }
-    
-    .time-picker-title {
-        font-size: 16px;
-        color: #333;
-        margin-bottom: 15px;
-        font-weight: 500;
-    }
-    
-    /* 하단 버튼 영역 */
-    .button-area {
-        flex-shrink: 0; /* 버튼 영역 크기 고정 */
-        padding: 20px 0;
-    }
-    
-    .start-button {
-        display: block;
-        width: 92%;
-        max-width: 520px;
-        min-width: 260px;
-        margin: 0 auto;
-        padding: 14px 18px;
-        background: #f4c043;
-        color: #fff;
-        border: none;
-        border-radius: 34px;
-        font-weight: 800;
-        font-size: 18px;
-        text-align: center;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-        white-space: nowrap;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-    
-    .start-button:hover {
-        background: #f2b632;
-    }
-    
-    .start-button:active {
-        background: #f0a500;
-    }
-    
-    /* 선택된 날짜 스타일 */
-    .selected-date {
-        background-color: #f4c043 !important;
-        color: white !important;
-        border-radius: 4px;
-    }
-</style>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .deadline-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: url("{% static 'img/intro_background.jpg' %}") center/cover no-repeat;
+        }
+
+        /* 상단 헤더 영역 */
+        .header-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px 20px;
+            text-align: center;
+        }
+
+        /* 고양이 캐릭터 - 배경 이미지 사용 시 불필요하므로 제거 */
+        .cat-character {
+            display: none;
+        }
+
+        /* 제목 - 배경 이미지에 텍스트가 포함되어 있으므로 숨김 */
+        .main-title,
+        .service-name {
+            display: none;
+        }
+
+        /* 하단 카드 영역 */
+        .card-section {
+            background: white;
+            border-radius: 25px 25px 0 0;
+            padding: 30px 20px 40px;
+            box-shadow: 0 -8px 30px rgba(0,0,0,0.1);
+            min-height: 300px;
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c2c2c;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .card-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* 폼 스타일 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            font-size: 16px;
+            background: #fafafa;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #f4c043;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(244, 192, 67, 0.1);
+        }
+
+        .datetime-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .datetime-col {
+            flex: 1;
+        }
+
+        /* 제출 버튼 */
+        .submit-button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #f4c043 0%, #f1b02a 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(244, 192, 67, 0.3);
+        }
+
+        .submit-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #f1b02a 0%, #e6a020 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 192, 67, 0.4);
+        }
+
+        .submit-button:disabled {
+            background: #ddd;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 에러/성공 메시지 */
+        .message {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .success-message {
+            background: #efe;
+            color: #363;
+            border: 1px solid #cfc;
+        }
+
+        /* 반응형 */
+        @media (max-width: 480px) {
+            .header-section {
+                padding: 30px 15px 15px;
+            }
+
+            .card-section {
+                padding: 25px 15px 35px;
+                border-radius: 20px 20px 0 0;
+            }
+
+            .datetime-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
-<div class="date-setting-container">
-    <header class="page-header">
-        <h1 class="page-title">팀플 기간 설정</h1>
-    </header>
-    
-    <!-- 중앙 컨텐츠 영역 -->
-    <div class="content-center">
-        <form action="{% url 'set_deadline' %}" method="post" id="deadline-form">
-            {% csrf_token %}
-            <div class="calendar-container">
-                <!-- 기본 HTML date input으로 교체 -->
-                <div style="text-align: center;">
-                    <label for="deadline_date" style="display: block; margin-bottom: 10px; font-size: 16px; color: #333;">마감 날짜 선택</label>
-                    <input type="date" name="deadline_date" id="deadline_date" 
-                           style="padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; background: white;" 
-                           required>
-                </div>
-            </div>
-            <div class="time-picker-container">
-                <div class="time-picker-title">마감 시간 설정</div>
-                <div class="time-picker-wrapper">
-                    <input type="time" name="deadline_time" id="deadline_time" class="time-input" required>
-                    <span class="time-separator">까지</span>
-                </div>
-            </div>
-        </form>
-    </div>
-    
-    <!-- 하단 버튼 영역 -->
-    <div class="button-area">
-        <button type="submit" form="deadline-form" class="start-button">시작하기</button>
-    </div>
-</div>
-{% endblock %}
+    <div class="deadline-container">
+        <div class="header-section">
+            <!-- 배경 이미지에 텍스트가 포함되어 있으므로 별도 텍스트는 제거 -->
+        </div>
 
-{% block scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    // 기본 date input 사용으로 달력 라이브러리 제거
-    const dateInput = document.getElementById('deadline_date');
-    
-    // 오늘 날짜를 최소값으로 설정 (과거 날짜 선택 불가)
-    const today = new Date().toISOString().split('T')[0];
-    dateInput.min = today;
-    
-    console.log('날짜 입력 필드 설정 완료. 최소 날짜:', today);
+        <div class="card-section">
+            <h2 class="card-title">언제까지 할까?</h2>
+            <p class="card-subtitle">마감일을 입력해줘</p>
 
-    // 제출 전 날짜와 시간 선택 여부 확인
-    document.getElementById('deadline-form').addEventListener('submit', (e) => {
-        const dateVal = document.getElementById('deadline_date').value;
-        const timeVal = document.getElementById('deadline_time').value;
-        
-        // 디버깅용 콘솔 출력
-        console.log('=== 폼 제출 시 체크 ===');
-        console.log('제출 시 날짜 값:', dateVal);
-        console.log('제출 시 시간 값:', timeVal);
-        console.log('날짜 값 존재 여부:', !!dateVal);
-        console.log('시간 값 존재 여부:', !!timeVal);
-        
-        if (!dateVal || !timeVal) {
-            e.preventDefault();
-            alert('마감 날짜와 시간을 꼭 선택해주세요!');
-            return false;
-        }
-    });
-});
-</script>
+            {% if error %}
+                <div class="message error-message">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+            <form action="{% url 'core:set_deadline' %}" method="post" id="deadline-form">
+                {% csrf_token %}
+                <input type="hidden" name="team_id" value="{{ request.session.team_id }}">
+
+                <div class="datetime-row">
+                    <div class="datetime-col">
+                        <label class="form-label" for="deadline_date">마감 날짜</label>
+                        <input type="date" 
+                               name="deadline_date" 
+                               id="deadline_date" 
+                               class="form-input"
+                               required>
+                    </div>
+                    
+                    <div class="datetime-col">
+                        <label class="form-label" for="deadline_time">마감 시간</label>
+                        <input type="time" 
+                               name="deadline_time" 
+                               id="deadline_time" 
+                               class="form-input"
+                               value="23:59"
+                               required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-button" id="submit-btn" disabled>
+                    마감 날짜를 선택해주세요
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('deadline_date');
+            const timeInput = document.getElementById('deadline_time');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            // 오늘 날짜를 최소 날짜로 설정
+            const today = new Date();
+            const todayString = today.toISOString().split('T')[0];
+            dateInput.min = todayString;
+            
+            // 최대 날짜를 1년 후로 설정
+            const maxDate = new Date();
+            maxDate.setFullYear(maxDate.getFullYear() + 1);
+            const maxDateString = maxDate.toISOString().split('T')[0];
+            dateInput.max = maxDateString;
+
+            // 폼 유효성 검사 함수
+            function checkFormValidity() {
+                const dateVal = dateInput.value;
+                const timeVal = timeInput.value;
+
+                if (dateVal && timeVal) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '빌려온 고양이 시작!';
+                } else {
+                    submitBtn.disabled = true;
+                    if (!dateVal) {
+                        submitBtn.textContent = '마감 날짜를 선택해주세요';
+                    } else {
+                        submitBtn.textContent = '마감 시간을 설정해주세요';
+                    }
+                }
+            }
+            
+            // 초기 상태 확인
+            checkFormValidity();
+            
+            // 입력 필드 변경 시 유효성 검사
+            dateInput.addEventListener('change', checkFormValidity);
+            dateInput.addEventListener('input', checkFormValidity);
+            timeInput.addEventListener('change', checkFormValidity);
+            timeInput.addEventListener('input', checkFormValidity);
+
+            // 폼 제출 이벤트 처리
+            document.getElementById('deadline-form').addEventListener('submit', function(e) {
+                const dateVal = dateInput.value;
+                const timeVal = timeInput.value;
+                
+                // 필수 값 검증
+                if (!dateVal || !timeVal) {
+                    e.preventDefault();
+                    alert('마감 날짜와 시간을 모두 선택해주세요.');
+                    return false;
+                }
+                
+                // 선택한 날짜가 과거인지 검증
+                const selectedDateTime = new Date(dateVal + 'T' + timeVal);
+                const now = new Date();
+                
+                if (selectedDateTime <= now) {
+                    e.preventDefault();
+                    alert('마감일은 현재 시간보다 이후여야 합니다.');
+                    return false;
+                }
+
+                // 로딩 상태로 변경
+                submitBtn.disabled = true;
+                submitBtn.textContent = '설정 중...';
+            });
+        });
+    </script>
 {% endblock %}

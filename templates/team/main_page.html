@@ -4,55 +4,46 @@
 {% block title %}팀플 관리{% endblock %}
 
 {% block head %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <!-- 아이콘을 위한 Font Awesome 라이브러리 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 {% endblock %}
 
 {% block content %}
-    <div class="main-container">
-        <header class="main-header">
-            <!-- 팀명 및 링크 공유 버튼 -->
-            <div class="team-info">
-                <!-- views.py에서 전달받은 팀명을 여기에 동적으로 표시 -->
-                <span class="team-name">{{ team.team_name }}</span>
-            </div>
-            <div class="header-actions">
-                <button class="share-button-bg">
-                    <i class="fas fa-link"></i>
-                </button>
-            </div>
-        </header>
-
-        <!-- 진행률 바 (초기 0%) -->
-        <div class="progress-bar-container">
-            <div class="progress-bar" style="width: 0%;"></div>
-            <span class="progress-text">0%</span>
+<div class="main-container">
+    <header class="main-header">
+        <div class="team-info">
+            <span class="team-name">{{ team.team_name }}</span>
         </div>
-
-        <!-- 팀원 리스트 컨테이너 (스크롤 가능) -->
-        <div class="member-list-container">
-            <!-- 팀원 리스트는 처음에는 비어 있음. -->
-
-            <!-- 팀원 추가 버튼만 존재 -->
-            <div class="member-item add-member">
-                <div class="member-profile add-button-circle">
-                    <i class="fas fa-plus add-icon"></i>
-                </div>
-                <div class="member-role-box add-member-text">
-                    <span class="member-role-text">팀원으로 참가하기</span>
-                </div>
-            </div>
+        <div class="header-actions">
+            <button class="share-button-bg">
+                <i class="fas fa-link"></i>
+            </button>
         </div>
+    </header>
 
-        <!-- 하단 버튼들 -->
-        <div class="button-grid">
-            <a href="{% url 'todo_list:list' team_id=team.team_id %}" class="grid-button">To-Do list</a>
-            <button class="grid-button">스케줄 확인하기</button>
-            <button class="grid-button">역할 설정하기</button>
-            <button class="grid-button">D-day</button>
-            <button class="grid-button">when2meet</button>
-            <button class="grid-button">링크 모음</button>
+    <div class="progress-bar-container">
+        <div class="progress-bar" style="width: 0%;"></div>
+        <span class="progress-text">0%</span>
+    </div>
+
+    <div class="member-list-container">
+        <div class="member-item add-member">
+            <div class="member-profile add-button-circle">
+                <i class="fas fa-plus add-icon"></i>
+            </div>
+            <div class="member-role-box add-member-text">
+                <span class="member-role-text">팀원으로 참가하기</span>
+            </div>
         </div>
     </div>
+
+    <div class="button-grid">
+        <a href="{% url 'todo_list:list' team_id=team.team_id %}" class="grid-button">To-Do list</a>
+        <button class="grid-button">스케줄 확인하기</button>
+        <button class="grid-button">역할 설정하기</button>
+        <button class="grid-button">D-day</button>
+        <button class="grid-button">when2meet</button>
+        <button class="grid-button">링크 모음</button>
+    </div>
+</div>
 {% endblock %}

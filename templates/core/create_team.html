@@ -12,7 +12,7 @@
                 <h2 class="activity-view-title">어떤 팀플이냥?</h2>
             </div>
             
-            <form action="{% url 'create_team' %}" method="post">
+            <form action="{% url 'core:create_team' %}" method="post">
                 {% csrf_token %}
                 <!-- 전공/교양/동아리/기타 버튼 블록을 삭제했습니다. -->
 

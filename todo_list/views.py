@@ -1,38 +1,27 @@
+# todo_list/views.py
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
 from team.models import Team
-from .models import TodoItem
 
-def todo_list_page(request, team_id):
-    team = get_object_or_404(Team, team_id=team_id)
-    todos = TodoItem.objects.filter(team=team).order_by('due_date')
+def list(request, team_id):
+    try:
+        team = Team.objects.get(team_id=team_id)
+    except Team.DoesNotExist:
+        return redirect('core:index')
 
     context = {
-        'team_id': team.team_id,
-        'todos': todos,
+        'team': team,
+        'team_id': team_id
     }
     return render(request, 'todo_list/todo_list_page.html', context)
 
-def todo_add_page(request, team_id):
-    team = get_object_or_404(Team, team_id=team_id)
-    if request.method == 'POST':
-        title = request.POST.get('title')
-        due_date = request.POST.get('due_date')
-        assignee = request.POST.get('assignee_id') # 나중에 멤버 ID로 변경 예정
-        priority = request.POST.get('priority')
-        description = request.POST.get('description')
+def new(request, team_id):
+    try:
+        team = Team.objects.get(team_id=team_id)
+    except Team.DoesNotExist:
+        return redirect('core:index')
 
-        TodoItem.objects.create(
-            team=team,
-            title=title,
-            due_date=due_date,
-            assignee=assignee,
-            priority=priority,
-            description=description,
-        )
+    if request.method == 'POST':
+        # 여기에 새 할 일 저장 로직 추가
         return redirect('todo_list:list', team_id=team_id)
 
-    context = {
-        'team_id': team.team_id,
-    }
-    return render(request, 'todo_list/todo_add_page.html', context)
+    return render(request, 'todo_list/todo_new.html', {'team': team, 'team_id': team_id})
