@@ -4,46 +4,62 @@
 {% block title %}팀플 관리{% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 {% endblock %}
 
 {% block content %}
-<div class="main-container">
-    <header class="main-header">
-        <div class="team-info">
-            <span class="team-name">{{ team.team_name }}</span>
-        </div>
-        <div class="header-actions">
-            <button class="share-button-bg">
-                <i class="fas fa-link"></i>
-            </button>
-        </div>
-    </header>
-
-    <div class="progress-bar-container">
-        <div class="progress-bar" style="width: 0%;"></div>
-        <span class="progress-text">0%</span>
-    </div>
-
-    <div class="member-list-container">
-        <div class="member-item add-member">
-            <div class="member-profile add-button-circle">
-                <i class="fas fa-plus add-icon"></i>
+    <div class="main-container">
+        <header class="main-header">
+            <div class="team-info">
+                <span class="team-name">{{ team.team_name }}</span>
             </div>
-            <div class="member-role-box add-member-text">
-                <span class="member-role-text">팀원으로 참가하기</span>
+            <div class="header-actions">
+                <button class="share-button-bg">
+                    <i class="fas fa-link"></i>
+                </button>
             </div>
+        </header>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" style="width: 0%;"></div>
+            <span class="progress-text">0%</span>
+        </div>
+
+        <div class="member-list-container">
+            {% for member in team.members.all %}
+            <div class="member-item">
+                <div class="member-profile">
+                    <img src="{% static 'img/' %}{{ member.profile_image }}" alt="{{ member.nickname }}" class="member-cat-img">
+                </div>
+                <div class="member-role-box">
+                    <span class="member-role-text">{{ member.nickname }}</span>
+                    {% if member.tags %}
+                        <p class="member-tags">{{ member.tags }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+                <p class="no-members-text">팀원이 아직 없습니다. 아래 버튼을 눌러 팀원을 추가하세요.</p>
+            {% endfor %}
+
+            <a href="{% url 'team:add_member' team_id=team.team_id %}" class="member-item add-member">
+                <div class="member-profile add-button-circle">
+                    <i class="fas fa-plus add-icon"></i>
+                </div>
+                <div class="member-role-box add-member-text">
+                    <span class="member-role-text">팀원으로 참가하기</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="button-grid">
+            <button class="grid-button">To-Do list</button>
+            <button class="grid-button">스케줄 확인하기</button>
+            <button class="grid-button">역할 설정하기</button>
+            <button class="grid-button">D-day</button>
+            <button class="grid-button">when2meet</button>
+            <button class="grid-button">링크 모음</button>
         </div>
     </div>
-
-    <div class="button-grid">
-        <button class="grid-button">To-Do list</button>
-        <button class="grid-button">스케줄 확인하기</button>
-        <button class="grid-button">역할 설정하기</button>
-        <button class="grid-button">D-day</button>
-        <button class="grid-button">when2meet</button>
-        <button class="grid-button">링크 모음</button>
-    </div>
-</div>
 {% endblock %}
