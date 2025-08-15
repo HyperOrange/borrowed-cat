@@ -374,7 +374,7 @@ body {
     align-items: center;
     gap: 15px;
     padding: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 5px; /* 팀원 항목 간 간격을 좁힙니다. */
 }
 
 .member-profile {
@@ -397,7 +397,7 @@ body {
 
 .member-role-box {
     flex-grow: 1;
-    padding: 15px;
+    padding: 15px 15px; /* 흰색 박스의 상하 패딩을 줄여 세로 크기를 줄입니다. */
     background-color: #fff;
     border-radius: 15px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
