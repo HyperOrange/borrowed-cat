@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}프로필 설정{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+    <div class="profile-container">
+        <div class="page-header">
+            <h1 class="page-title">프로필 설정</h1>
+        </div>
+
+        <form action="{% url 'core:create_profile' team_id=team_id %}" method="post" id="profile-form">
+            {% csrf_token %}
+            <!-- 고양이 이미지 선택 -->
+            <div class="cat-selector">
+                <button type="button" class="arrow-btn" id="prev-cat"><i class="fas fa-chevron-left"></i></button>
+                <img id="cat-image" src="{% static 'img/cat_1.jpg' %}" alt="프로필 고양이 이미지" class="cat-profile">
+                <button type="button" class="arrow-btn" id="next-cat"><i class="fas fa-chevron-right"></i></button>
+                <!-- 선택된 이미지 경로를 저장할 hidden input -->
+                <input type="hidden" name="profile_image" id="profile-image-input" value="cat_1.jpg">
+            </div>
+
+            <!-- 닉네임 입력 -->
+            <div class="input-section">
+                <label for="nickname" class="input-label">닉네임</label>
+                <input type="text" id="nickname" name="nickname" class="text-input" placeholder="두 글자 이상 입력해주세요" required minlength="2">
+            </div>
+
+            <!-- 수식어 버튼 선택 -->
+            <div class="tag-section">
+                <h2 class="tag-title">당신을 가장 잘 나타내는 키워드는?</h2>
+                <div class="tag-grid">
+                    <button type="button" class="tag-button">책임감</button>
+                    <button type="button" class="tag-button">준비성</button>
+                    <button type="button" class="tag-button">부지런함</button>
+                    <button type="button" class="tag-button">꼼꼼함</button>
+                    <button type="button" class="tag-button">긍정적 마인드</button>
+                    <button type="button" class="tag-button">실행력</button>
+                    <button type="button" class="tag-button">열정</button>
+                    <button type="button" class="tag-button">논리적 사고</button>
+                    <button type="button" class="tag-button">소통</button>
+                    <button type="button" class="tag-button">끈기</button>
+                    <button type="button" class="tag-button">발표력</button>
+                    <button type="button" class="tag-button">예술감각</button>
+                    <button type="button" class="tag-button">창의적</button>
+                    <button type="button" class="tag-button">리더십</button>
+                    <button type="button" class="tag-button">쾌활한</button>
+                    <button type="button" class="tag-button">회의적인</button>
+                </div>
+                <!-- 선택된 태그들을 저장할 hidden input -->
+                <input type="hidden" name="tags" id="tags-input">
+            </div>
+
+            <button type="submit" class="start-button">확인</button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const catImages = ['cat_1.jpg', 'cat_2.jpg', 'cat_3.jpg', 'cat_4.jpg', 'cat_5.jpg'];
+            let currentCatIndex = 0;
+            const catImageElement = document.getElementById('cat-image');
+            const profileImageInput = document.getElementById('profile-image-input');
+            
+            // 고양이 이미지 변경 함수
+            function changeCat(direction) {
+                currentCatIndex = (currentCatIndex + direction + catImages.length) % catImages.length;
+                const newImage = catImages[currentCatIndex];
+                catImageElement.src = "{% static 'img/' %}" + newImage;
+                profileImageInput.value = newImage;
+            }
+
+            document.getElementById('prev-cat').addEventListener('click', () => changeCat(-1));
+            document.getElementById('next-cat').addEventListener('click', () => changeCat(1));
+
+            const tagButtons = document.querySelectorAll('.tag-button');
+            const tagsInput = document.getElementById('tags-input');
+            const selectedTags = new Set();
+            
+            // 태그 선택/해제 로직
+            tagButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault(); // 버튼의 기본 제출 동작 방지
+                    this.classList.toggle('selected');
+                    const tag = this.textContent.trim();
+                    if (this.classList.contains('selected')) {
+                        selectedTags.add(tag);
+                    } else {
+                        selectedTags.delete(tag);
+                    }
+                    tagsInput.value = Array.from(selectedTags).join(',');
+                    console.log('선택된 태그:', tagsInput.value);
+                });
+            });
+
+            // 닉네임과 태그 선택 여부 검증
+            document.getElementById('profile-form').addEventListener('submit', function(e) {
+                const nickname = document.getElementById('nickname').value;
+                if (nickname.length < 2) {
+                    e.preventDefault();
+                    alert('닉네임을 두 글자 이상 입력해주세요.');
+                } else if (selectedTags.size === 0) {
+                    e.preventDefault();
+                    alert('수식어를 하나 이상 선택해주세요.');
+                }
+            });
+        });
+    </script>
+{% endblock %}
