@@ -11,16 +11,15 @@
             padding: 0;
             background-color: #f8f9fa;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            overflow-y: auto;
         }
 
         .profile-container {
-            padding: 20px;
+            padding: 20px 20px 50px 20px;
             max-width: 420px;
             margin: 0 auto;
-            min-height: 100vh;
             box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
             background-color: #f8f9fa;
         }
 
@@ -123,7 +122,6 @@
         /* 태그 선택 영역 */
         .tag-section {
             margin-bottom: 20px;
-            flex: 1;
         }
 
         .tag-title {
@@ -178,7 +176,7 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-top: 10px;
+            margin: 10px 0 30px 0;
             box-shadow: 0 4px 15px rgba(244, 192, 67, 0.3);
         }
 
@@ -234,10 +232,16 @@
 {% block content %}
     <div class="profile-container">
         <div class="page-header">
-            <h1 class="page-title">프로필 설정</h1>
+            <h1 class="page-title">
+                {% if is_edit %}
+                    프로필 수정
+                {% else %}
+                    프로필 설정
+                {% endif %}
+            </h1>
         </div>
 
-        <form action="{% url 'team:add_member' team_id=team_id %}" method="post" id="profile-form">
+        <form action="{% if is_edit %}{% url 'team:edit_member' team_id=team_id member_id=member.id %}{% else %}{% url 'team:add_member' team_id=team_id %}{% endif %}" method="post" id="profile-form">
             {% csrf_token %}
             
             <!-- 고양이 이미지 선택 -->
@@ -257,7 +261,7 @@
             <!-- 닉네임 입력 -->
             <div class="input-section">
                 <label for="nickname" class="input-label">닉네임</label>
-                <input type="text" id="nickname" name="nickname" class="text-input" placeholder="두 글자 이상 입력해주세요" required minlength="2">
+                <input type="text" id="nickname" name="nickname" class="text-input" placeholder="두 글자 이상 입력해주세요" required minlength="2" {% if is_edit %}value="{{ member.nickname }}"{% endif %}>
             </div>
 
             <!-- 수식어 버튼 선택 -->
@@ -284,59 +288,93 @@
                 <input type="hidden" name="tags" id="tags-input">
             </div>
 
-            <button type="submit" class="start-button">확인</button>
+            <button type="submit" class="start-button">
+                {% if is_edit %}
+                    수정완료
+                {% else %}
+                    확인
+                {% endif %}
+            </button>
         </form>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const catImages = ['cat_1.jpg', 'cat_2.jpg', 'cat_3.jpg', 'cat_4.jpg', 'cat_5.jpg'];
-            let currentCatIndex = 0;
-            const catImageElement = document.getElementById('cat-image');
-            const profileImageInput = document.getElementById('profile-image-input');
-            
-            // 고양이 이미지 변경 함수
-            function changeCat(direction) {
-                currentCatIndex = (currentCatIndex + direction + catImages.length) % catImages.length;
-                const newImage = catImages[currentCatIndex];
-                catImageElement.src = "{% static 'img/' %}" + newImage;
-                profileImageInput.value = newImage;
-            }
+        (function() {
+            document.addEventListener('DOMContentLoaded', function() {
+                const catImages = ['cat_1.jpg', 'cat_2.jpg', 'cat_3.jpg', 'cat_4.jpg', 'cat_5.jpg'];
+                let currentCatIndex = 0;
+                const catImageElement = document.getElementById('cat-image');
+                const profileImageInput = document.getElementById('profile-image-input');
+                
+                // 수정 모드일 때 기존 데이터 로드
+                {% if is_edit %}
+                    // 기존 프로필 이미지 설정
+                    const existingImage = '{{ member.profile_image }}';
+                    currentCatIndex = catImages.indexOf(existingImage);
+                    if (currentCatIndex === -1) currentCatIndex = 0;
+                    catImageElement.src = "{% static 'img/' %}" + catImages[currentCatIndex];
+                    profileImageInput.value = catImages[currentCatIndex];
+                    
+                    // 기존 태그 선택 상태 설정
+                    const existingTags = '{{ member.tags }}'.split(',').map(tag => tag.trim()).filter(tag => tag);
+                    var selectedTags = new Set(existingTags);
+                {% else %}
+                    var selectedTags = new Set();
+                {% endif %}
+                
+                // 고양이 이미지 변경 함수
+                function changeCat(direction) {
+                    currentCatIndex = (currentCatIndex + direction + catImages.length) % catImages.length;
+                    const newImage = catImages[currentCatIndex];
+                    catImageElement.src = "{% static 'img/' %}" + newImage;
+                    profileImageInput.value = newImage;
+                }
 
-            document.getElementById('prev-cat').addEventListener('click', () => changeCat(-1));
-            document.getElementById('next-cat').addEventListener('click', () => changeCat(1));
+                document.getElementById('prev-cat').addEventListener('click', () => changeCat(-1));
+                document.getElementById('next-cat').addEventListener('click', () => changeCat(1));
 
-            const tagButtons = document.querySelectorAll('.tag-button');
-            const tagsInput = document.getElementById('tags-input');
-            const selectedTags = new Set();
-            
-            // 태그 선택/해제 로직
-            tagButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    this.classList.toggle('selected');
-                    const tag = this.textContent.trim();
-                    if (this.classList.contains('selected')) {
-                        selectedTags.add(tag);
-                    } else {
-                        selectedTags.delete(tag);
-                    }
+                const tagButtons = document.querySelectorAll('.tag-button');
+                const tagsInput = document.getElementById('tags-input');
+                
+                // 수정 모드일 때 기존 선택된 태그 표시
+                {% if is_edit %}
+                    tagButtons.forEach(button => {
+                        const tag = button.textContent.trim();
+                        if (selectedTags.has(tag)) {
+                            button.classList.add('selected');
+                        }
+                    });
                     tagsInput.value = Array.from(selectedTags).join(',');
-                    console.log('선택된 태그:', tagsInput.value);
+                {% endif %}
+                
+                // 태그 선택/해제 로직
+                tagButtons.forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        this.classList.toggle('selected');
+                        const tag = this.textContent.trim();
+                        if (this.classList.contains('selected')) {
+                            selectedTags.add(tag);
+                        } else {
+                            selectedTags.delete(tag);
+                        }
+                        tagsInput.value = Array.from(selectedTags).join(',');
+                        console.log('선택된 태그:', tagsInput.value);
+                    });
+                });
+
+                // 폼 검증
+                document.getElementById('profile-form').addEventListener('submit', function(e) {
+                    const nickname = document.getElementById('nickname').value;
+                    if (nickname.length < 2) {
+                        e.preventDefault();
+                        alert('닉네임을 두 글자 이상 입력해주세요.');
+                    } else if (selectedTags.size === 0) {
+                        e.preventDefault();
+                        alert('수식어를 하나 이상 선택해주세요.');
+                    }
                 });
             });
-
-            // 폼 검증
-            document.getElementById('profile-form').addEventListener('submit', function(e) {
-                const nickname = document.getElementById('nickname').value;
-                if (nickname.length < 2) {
-                    e.preventDefault();
-                    alert('닉네임을 두 글자 이상 입력해주세요.');
-                } else if (selectedTags.size === 0) {
-                    e.preventDefault();
-                    alert('수식어를 하나 이상 선택해주세요.');
-                }
-            });
-        });
+        })();
     </script>
 {% endblock %}

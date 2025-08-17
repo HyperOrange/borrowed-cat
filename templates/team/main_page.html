@@ -28,7 +28,7 @@
 
         <div class="member-list-container">
             {% for member in team.members.all %}
-            <div class="member-item">
+            <a href="{% url 'team:edit_member' team_id=team.team_id member_id=member.id %}" class="member-item member-link">
                 <div class="member-profile">
                     <img src="{% static 'img/' %}{{ member.profile_image }}" alt="{{ member.nickname }}" class="member-cat-img">
                 </div>
@@ -38,12 +38,13 @@
                         <p class="member-tags">{{ member.tags }}</p>
                     {% endif %}
                 </div>
-            </div>
+            </a>
             {% empty %}
                 <p class="no-members-text">팀원이 아직 없습니다. 아래 버튼을 눌러 팀원을 추가하세요.</p>
             {% endfor %}
-
-            <a href="{% url 'team:add_member' team_id=team.team_id %}" class="member-item add-member">
+            
+            <a href="{% url 'team:add_member' team_id=team.team_id %}" 
+            class="member-item add-member" style="text-decoration: none !important;">
                 <div class="member-profile add-button-circle">
                     <i class="fas fa-plus add-icon"></i>
                 </div>
@@ -62,4 +63,16 @@
             <button class="grid-button">링크 모음</button>
         </div>
     </div>
+
+    <style>
+        .member-link {
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease;
+        }
+        
+        .member-link:hover {
+            transform: translateY(-2px);
+        }
+    </style>
 {% endblock %}
