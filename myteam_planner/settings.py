@@ -122,13 +122,18 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# Django가 정적 파일을 찾을 위치를 지정합니다.
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
 
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+    # 이 부분을 추가해 Django가 role_distribution 앱의 static 파일을 찾을 수 있게 합니다.
+    BASE_DIR / 'role_distribution' / 'static',
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'

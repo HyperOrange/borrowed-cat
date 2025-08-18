@@ -57,7 +57,9 @@
         <div class="button-grid">
             <button class="grid-button">To-Do list</button>
             <button class="grid-button">스케줄 확인하기</button>
-            <button class="grid-button">역할 설정하기</button>
+            <a href="{% url 'role_distribution:role_distribution_page' team_id=team.team_id %}" class="grid-button">
+                역할 설정하기
+            </a>
             <button class="grid-button">D-day</button>
             <button class="grid-button">when2meet</button>
             <button class="grid-button">링크 모음</button>
