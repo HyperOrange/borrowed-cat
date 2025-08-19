@@ -15,6 +15,10 @@
                 <span class="team-name">{{ team.team_name }}</span>
             </div>
             <div class="header-actions">
+                <!-- D-Day 표시 영역을 공유 버튼 옆으로 이동 -->
+                <div class="d-day-badge">
+                    <span id="d-day-text">D-Day</span>
+                </div>
                 <button class="share-button-bg">
                     <i class="fas fa-link"></i>
                 </button>
@@ -54,13 +58,14 @@
             </a>
         </div>
 
-        <div class="button-grid">
+        <!-- 새로운 버튼 레이아웃 -->
+        <div class="button-grid-new">
             <button class="grid-button">To-Do list</button>
-            <button class="grid-button">스케줄 확인하기</button>
-            <button class="grid-button">역할 설정하기</button>
-            <button class="grid-button">D-day</button>
-            <a href="{% url 'core:index' %}" class="grid-button styled-link">새 팀플 시작하기</a>
+            <button class="grid-button">역할 정하기</button>
             <button class="grid-button">링크 모음</button>
+        </div>
+        <div class="start-new-team-button-container">
+            <a href="{% url 'core:index' %}" class="start-new-team-button">새 팀플 시작하기</a>
         </div>
     </div>
 
@@ -74,17 +79,57 @@
         .member-link:hover {
             transform: translateY(-2px);
         }
-        .styled-link {
-            /* Remove underline */
-            text-decoration: none !important;
-            /* Make the link behave like a flexbox for content centering */
+
+        /* 새로운 버튼 레이아웃 스타일 */
+        .button-grid-new {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .start-new-team-button-container {
+            width: 100%;
             display: flex;
             justify-content: center;
+        }
+        
+        .start-new-team-button {
+            width: 100%;
+            background-color: #f1b02a;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            padding: 15px 0;
+            border-radius: 25px;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .d-day-badge {
+            background-color: #f1b02a;
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            /* Match the height of other buttons */
-            height: 40px; 
-            /* Match button padding */
-            padding: 20px 10px; 
+            margin-bottom: 20px;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* D-Day와 공유 버튼 사이 간격 */
         }
     </style>
 {% endblock %}
@@ -105,6 +150,26 @@
                     alert('클립보드 복사에 실패했습니다. 직접 URL을 복사해주세요.');
                 });
             });
+        }
+
+        // D-Day 계산 및 표시
+        const deadlineDate = '{{ team.deadline_date|date:"Y-m-d" }}';
+        const deadlineTime = '{{ team.deadline_time|time:"H:i" }}';
+
+        if (deadlineDate && deadlineTime) {
+            const deadline = new Date(`${deadlineDate}T${deadlineTime}`);
+            const today = new Date();
+            const timeDiff = deadline.getTime() - today.getTime();
+            const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            
+            const dDayText = document.getElementById('d-day-text');
+            if (daysDiff === 0) {
+                dDayText.textContent = 'D-Day';
+            } else if (daysDiff > 0) {
+                dDayText.textContent = `D-${daysDiff}`;
+            } else {
+                dDayText.textContent = `D+${Math.abs(daysDiff)}`;
+            }
         }
     });
 </script>
