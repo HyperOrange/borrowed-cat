@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',  # core 앱 추가
     'team',  # team 앱 추가
-    # 'todo_list', # todo_list 앱 추가
+    'todo_list', # todo_list 앱을 다시 추가합니다.
+    # 'role_distribution', # 이 부분을 제거합니다.
 ]
 
 MIDDLEWARE = [
@@ -120,6 +121,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Django가 정적 파일을 찾을 위치를 지정합니다.
 STATICFILES_DIRS = [

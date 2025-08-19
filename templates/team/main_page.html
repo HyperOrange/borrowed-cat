@@ -60,7 +60,7 @@
 
         <!-- 새로운 버튼 레이아웃 -->
         <div class="button-grid-new">
-            <button class="grid-button">To-Do list</button>
+            <a href="{% url 'todo_list:list' team_token=team.team_id %}" class="grid-button">To-Do list</a>
             <button class="grid-button">역할 정하기</button>
             <button class="grid-button">링크 모음</button>
         </div>
@@ -86,6 +86,27 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-bottom: 20px;
+        }
+
+        .grid-button {
+            background-color: #fff;
+            color: #333;
+            border: 2px solid #f1b02a;
+            border-radius: 15px;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .grid-button:hover {
+            background-color: #f1b02a;
+            color: #fff;
         }
 
         .start-new-team-button-container {
