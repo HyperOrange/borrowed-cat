@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -123,3 +124,74 @@
     </script>
 </body>
 </html>
+=======
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}팀플 관리{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+  {% url 'todo:list' team.team_id as TODO_URL %}
+
+  <!-- 최상단 디버그 링크(항상 클릭 가능) -->
+  <a href="{{ TODO_URL }}"
+     style="position:fixed; top:8px; left:8px; z-index:2147483647; background:#222; color:#fff; padding:6px 8px; border-radius:8px; text-decoration:none;">
+    DEBUG → To-Do
+  </a>
+
+  <div class="main-container">
+    <header class="main-header">
+      <div class="team-info"><span class="team-name">{{ team.team_name }}</span></div>
+      <div class="header-actions"><button class="share-button-bg"><i class="fas fa-link"></i></button></div>
+    </header>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar" style="width:0%;"></div>
+      <span class="progress-text">0%</span>
+    </div>
+
+    <div class="member-list-container">
+      {% for member in team.members.all %}
+        <a href="{% url 'team:edit_member' team_id=team.team_id member_id=member.id %}" class="member-item member-link">
+          <div class="member-profile">
+            <img src="{% static 'img/' %}{{ member.profile_image }}" alt="{{ member.nickname }}" class="member-cat-img">
+          </div>
+          <div class="member-role-box">
+            <span class="member-role-text">{{ member.nickname }}</span>
+            {% if member.tags %}<p class="member-tags">{{ member.tags }}</p>{% endif %}
+          </div>
+        </a>
+      {% empty %}
+        <p class="no-members-text">팀원이 아직 없습니다. 아래 버튼을 눌러 팀원을 추가하세요.</p>
+      {% endfor %}
+
+      <a href="{% url 'team:add_member' team_id=team.team_id %}" class="member-item add-member" style="text-decoration:none;">
+        <div class="member-profile add-button-circle"><i class="fas fa-plus add-icon"></i></div>
+        <div class="member-role-box add-member-text"><span class="member-role-text">팀원으로 참가하기</span></div>
+      </a>
+    </div>
+
+    <div class="button-grid" style="position:relative; z-index:1000;">
+      <!-- To-Do로 이동(링크 또는 버튼 둘 중 하나만 사용) -->
+      <a href="{{ TODO_URL }}" class="grid-button" style="text-decoration:none; display:block;">To-Do list</a>
+
+      <button class="grid-button">스케줄 확인하기</button>
+      <button class="grid-button">역할 설정하기</button>
+      <button class="grid-button">D-day</button>
+      <button class="grid-button">when2meet</button>
+      <button class="grid-button">링크 모음</button>
+    </div>
+  </div>
+
+  <style>
+    .member-link{ text-decoration:none; color:inherit; transition:transform .2s ease; }
+    .member-link:hover{ transform:translateY(-2px); }
+    .grid-button{ pointer-events:auto; cursor:pointer; }
+  </style>
+{% endblock %}
+>>>>>>> Stashed changes

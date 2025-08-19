@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>To-Do list – {{ team.team_name }}</h1>
+
+<p><a href="{% url 'core:main_page' team.team_id %}">← 메인으로</a></p>
+
+<form method="post" action="{% url 'todo:new' team.team_id %}">
+  {% csrf_token %}
+  <div><label>제목 <input type="text" name="title" required></label></div>
+  <div><label>마감 <input type="datetime-local" name="due_at"></label></div>
+  <div>
+    <label>담당자
+      <select name="assignee">
+        <option value="">선택 안 함</option>
+        {% for m in assignees %}<option value="{{ m.id }}">{{ m.nickname }}</option>{% endfor %}
+      </select>
+    </label>
+  </div>
+  <div><label>메모 <textarea name="notes" rows="3"></textarea></label></div>
+  <button type="submit">추가</button>
+</form>
+
+<hr>
+
+<ul>
+{% for item in items %}
+  <li>
+    <strong>{{ item.title }}</strong>
+    {% if item.assignee %} — {{ item.assignee.nickname }}{% endif %}
+    {% if item.due_at %} — {{ item.due_at|date:"Y-m-d H:i" }}{% endif %}
+    {% if item.is_done %} ✅ 완료{% endif %}
+    <form method="post" action="{% url 'todo:toggle' team.team_id item.id %}" style="display:inline;">
+      {% csrf_token %}<button type="submit">완료/해제</button>
+    </form>
+    <a href="{% url 'todo:edit' team.team_id item.id %}">수정</a>
+    <form method="post" action="{% url 'todo:delete' team.team_id item.id %}" style="display:inline;" onsubmit="return confirm('삭제할까요?')">
+      {% csrf_token %}<button type="submit">삭제</button>
+    </form>
+  </li>
+{% empty %}
+  <li>아직 등록된 할 일이 없습니다.</li>
+{% endfor %}
+</ul>
+{% endblock %}

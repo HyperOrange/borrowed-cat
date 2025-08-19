@@ -2,6 +2,7 @@
 from django.urls import path
 from . import views
 
+<<<<<<< Updated upstream
 app_name = "todo"  # ✅ namespace와 동일하게
 
 urlpatterns = [
@@ -18,4 +19,14 @@ urlpatterns = [
     path("<str:team_token>/delete/<int:todo_id>/", views.delete_todo_ajax, name="delete"),
     path("<str:team_token>/update/<int:todo_id>/", views.update_todo_ajax, name="update"),
     path("<str:team_token>/deadlines.json", views.todo_deadlines_json, name="deadlines_json"),
+=======
+app_name = "todo"
+urlpatterns = [
+    path("<uuid:team_id>/", views.page_list, name="list"),
+    path("<uuid:team_id>/new/", views.create_item, name="new"),
+    path("<uuid:team_id>/<int:pk>/edit/", views.update_item, name="edit"),
+    path("<uuid:team_id>/<int:pk>/toggle/", views.toggle_done, name="toggle"),
+    path("<uuid:team_id>/<int:pk>/delete/", views.delete_item, name="delete"),
+>>>>>>> Stashed changes
 ]
+
