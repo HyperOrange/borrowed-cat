@@ -44,7 +44,9 @@
                 </div>
             </a>
             {% empty %}
-                <p class="no-members-text">팀원이 아직 없습니다. 아래 버튼을 눌러 팀원을 추가하세요.</p>
+                <p class="no-members-text styled-text">
+                    팀원이 아직 없습니다! 우측상단 링크 복사 버튼을 눌러 해당 페이지를 공유하고, 아래 버튼을 눌러 팀원을 추가하세요.
+                </p>
             {% endfor %}
             
             <a href="{% url 'team:add_member' team_id=team.team_id %}" 
@@ -91,9 +93,9 @@
         .grid-button {
             background-color: #fff;
             color: #333;
-            border: 2px solid #f1b02a;
+            border: 2px solid #FFC107;
             border-radius: 15px;
-            padding: 15px 10px;
+            padding: 1px 10px;
             text-align: center;
             font-weight: bold;
             font-size: 14px;
@@ -105,7 +107,7 @@
         }
 
         .grid-button:hover {
-            background-color: #f1b02a;
+            background-color: #FFC107;
             color: #fff;
         }
 
@@ -117,7 +119,7 @@
         
         .start-new-team-button {
             width: 100%;
-            background-color: #f1b02a;
+            background-color: #FFC107;
             color: #fff;
             font-size: 18px;
             font-weight: bold;
@@ -130,7 +132,7 @@
         }
 
         .d-day-badge {
-            background-color: #f1b02a;
+            background-color: #FFC107;
             color: #fff;
             font-weight: bold;
             font-size: 14px;
@@ -151,6 +153,16 @@
             display: flex;
             align-items: center;
             gap: 10px; /* D-Day와 공유 버튼 사이 간격 */
+        }
+        /* 추가된 스타일 */
+        .styled-text {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 13px;
+            line-height: 1.5;
+            text-align: center;
         }
     </style>
 {% endblock %}
