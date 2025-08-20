@@ -1,0 +1,556 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}역할 분배{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+        }
+
+        .role-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 20px;
+            max-width: 420px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .member-assignment-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 10px;
+            margin-bottom: 20px;
+        }
+
+        .assignment-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .member-profile-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ddd;
+        }
+
+        .member-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .member-nickname {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .member-role {
+            font-size: 14px;
+            color: #ff6f61;
+            font-weight: 500;
+        }
+        
+        .assigned-role {
+            color: #2c72b8;
+        }
+
+        .bottom-button-group {
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bottom-button {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .random-assign-btn {
+            background: linear-gradient(135deg, #f4c043 0%, #f1b02a 100%);
+            color: white;
+        }
+
+        .random-assign-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 192, 67, 0.4);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .modal-header {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .radio-button {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .radio-button.selected {
+            border-color: #f1b02a;
+            background-color: #fef8e8;
+            color: #333;
+        }
+
+        .role-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .role-tag {
+            background-color: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            padding: 10px 18px;
+            font-size: 14px;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .role-tag.selected {
+            background: linear-gradient(135deg, #f4c043 0%, #f1b02a 100%);
+            border-color: #f4c043;
+            color: white;
+            font-weight: 600;
+        }
+
+        .add-role-input-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .add-role-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+        
+        .add-role-input:focus {
+            outline: none;
+            border-color: #f4c043;
+        }
+
+        .add-role-button {
+            width: 45px;
+            height: 45px;
+            background-color: #e9ecef;
+            color: #888;
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .modal-assign-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #f4c043 0%, #f1b02a 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(244, 192, 67, 0.3);
+        }
+
+        .modal-assign-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 192, 67, 0.4);
+        }
+        
+        .loading-modal {
+            display: none;
+            position: fixed;
+            z-index: 101;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-modal img {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+        }
+
+        .loading-modal p {
+            font-size: 16px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="role-container">
+        <header class="header">
+            <a href="{% url 'core:main_page' team_id=team.team_id %}" class="back-button">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            <h1 class="page-title">역할 분배하기</h1>
+        </header>
+
+        <div class="member-assignment-list">
+            {% for member in members_with_roles %}
+            <div class="assignment-item" data-member-id="{{ member.id }}" data-member-nickname="{{ member.nickname }}">
+                <img src="{% static 'img/' %}{{ member.profile_image }}" alt="{{ member.nickname }}" class="member-profile-img">
+                <div class="member-info">
+                    <span class="member-nickname">{{ member.nickname }}</span>
+                    <span class="member-role" id="role-{{ member.id }}">
+                        {% if member.role_name != "역할 미정" %}
+                            <span class="assigned-role">{{ member.role_name }}</span>
+                        {% else %}
+                            역할 미정
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            {% empty %}
+                <p style="text-align: center; color: #888;">팀원이 없습니다. 팀원 추가 후 이용해주세요.</p>
+            {% endfor %}
+        </div>
+
+        <div class="bottom-button-group">
+            <button class="bottom-button random-assign-btn" id="open-modal-btn">
+                역할 정하기
+            </button>
+        </div>
+    </div>
+    
+    <div class="modal" id="assign-modal">
+        <div class="modal-content">
+            <button class="close-btn" id="close-modal-btn">&times;</button>
+            <h2 class="modal-header"> 역할 정하기</h2>
+            
+            <form id="assign-form">
+                {% csrf_token %}
+                <div class="modal-section">
+                    <h3 class="section-title">역할 분배 대상</h3>
+                    <div class="radio-group">
+                        <div class="radio-button selected" data-target="전체">팀원 전체</div>
+                        <div class="radio-button" data-target="미정자만">역할 미정자만</div>
+                    </div>
+                    <input type="hidden" name="target_scope" id="target-scope-input" value="전체">
+                </div>
+                
+                <div class="modal-section">
+                    <h3 class="section-title">역할 중복 금지</h3>
+                    <div class="radio-group">
+                        <div class="radio-button selected" data-duplicates="false">역할 중복 금지</div>
+                        <div class="radio-button" data-duplicates="true">역할 중복 허용</div>
+                    </div>
+                    <input type="hidden" name="allow_duplicates" id="allow-duplicates-input" value="false">
+                </div>
+                
+                <div class="modal-section">
+                    <h3 class="section-title">포함할 역할</h3>
+                    <div class="role-list" id="role-list">
+                        {% for role in predefined_roles %}
+                        <div class="role-tag" data-role-name="{{ role }}">{{ role }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="add-role-input-group">
+                        <input type="text" id="new-role-input" class="add-role-input" placeholder="새로운 역할 추가하기">
+                        <button type="button" class="add-role-button" id="add-role-btn">+</button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="modal-assign-btn" id="assign-submit-btn">
+                    확인
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="loading-modal" id="loading-modal">
+        <img src="{% static 'img/KakaoTalk_20250820_220322100.jpg' %}" alt="고양이가 열심히 역할 정하는 중">
+        <p>고양이가 AI가 열심히 맞춤역할 정하는중....</p>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // CSRF 토큰을 가져옵니다.
+            const CSRF_TOKEN = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            // 모달 제어
+            const openModalBtn = document.getElementById('open-modal-btn');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const assignModal = document.getElementById('assign-modal');
+            const loadingModal = document.getElementById('loading-modal');
+
+            // AI 랜덤 정하기 버튼 클릭 시 모달 열기
+            openModalBtn.addEventListener('click', () => {
+                assignModal.style.display = 'flex';
+            });
+
+            // 모달 닫기 버튼 클릭 시 모달 닫기
+            closeModalBtn.addEventListener('click', () => {
+                assignModal.style.display = 'none';
+            });
+
+            // 모달 외부 클릭 시 모달 닫기
+            window.addEventListener('click', (event) => {
+                if (event.target === assignModal) {
+                    assignModal.style.display = 'none';
+                }
+            });
+
+            // 라디오 버튼 그룹
+            const radioGroups = document.querySelectorAll('.radio-group');
+            radioGroups.forEach(group => {
+                group.addEventListener('click', (event) => {
+                    const button = event.target.closest('.radio-button');
+                    if (button) {
+                        group.querySelectorAll('.radio-button').forEach(btn => btn.classList.remove('selected'));
+                        button.classList.add('selected');
+
+                        const input = button.closest('.modal-section').querySelector('input[type="hidden"]');
+                        if (input) {
+                            input.value = button.dataset.target || button.dataset.duplicates;
+                        }
+                    }
+                });
+            });
+            
+            // 역할 태그 선택
+            const roleListContainer = document.getElementById('role-list');
+            roleListContainer.addEventListener('click', (event) => {
+                const tag = event.target.closest('.role-tag');
+                if (tag) {
+                    tag.classList.toggle('selected');
+                }
+            });
+            
+            // 새로운 역할 추가
+            const addRoleBtn = document.getElementById('add-role-btn');
+            const newRoleInput = document.getElementById('new-role-input');
+            
+            addRoleBtn.addEventListener('click', () => {
+                const roleName = newRoleInput.value.trim();
+                if (roleName) {
+                    const newTag = document.createElement('div');
+                    newTag.classList.add('role-tag', 'selected');
+                    newTag.dataset.roleName = roleName;
+                    newTag.textContent = roleName;
+                    roleListContainer.appendChild(newTag);
+                    newRoleInput.value = '';
+                }
+            });
+
+            // 폼 제출 (AJAX)
+            document.getElementById('assign-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                assignModal.style.display = 'none';
+                loadingModal.style.display = 'flex';
+                
+                const form = e.target;
+                const formData = new FormData();
+                formData.append('csrfmiddlewaretoken', CSRF_TOKEN);
+                formData.append('target_scope', form.querySelector('#target-scope-input').value);
+                formData.append('allow_duplicates', form.querySelector('#allow-duplicates-input').value);
+
+                const selectedRoles = Array.from(document.querySelectorAll('.role-tag.selected'))
+                                           .map(tag => tag.dataset.roleName);
+                selectedRoles.forEach(role => {
+                    formData.append('selected_roles', role);
+                });
+                
+                const newRoleName = newRoleInput.value.trim();
+                if (newRoleName) {
+                    formData.append('new_role', newRoleName);
+                }
+
+                try {
+                    const response = await fetch("{% url 'role_distribution:random_assign' team_id=team.team_id %}", {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    const result = await response.json();
+                    
+                    loadingModal.style.display = 'none';
+
+                    if (result.success) {
+                        alert('역할 배정이 완료되었습니다!');
+                        
+                        const members = document.querySelectorAll('.assignment-item');
+                        const updatedAssignments = {};
+                        result.assignments.forEach(a => {
+                            updatedAssignments[a.member_id] = a.role_name;
+                        });
+                        
+                        members.forEach(item => {
+                            const memberId = item.dataset.memberId;
+                            const roleSpan = document.getElementById(`role-${memberId}`);
+                            
+                            if (updatedAssignments[memberId]) {
+                                roleSpan.innerHTML = `<span class="assigned-role">${updatedAssignments[memberId]}</span>`;
+                            } else {
+                                roleSpan.innerHTML = `역할 미정`;
+                            }
+                        });
+                    } else {
+                        alert('역할 배정 실패: ' + result.message);
+                    }
+                } catch (error) {
+                    loadingModal.style.display = 'none';
+                    console.error('Error:', error);
+                    alert('네트워크 오류가 발생했습니다.');
+                }
+            });
+        });
+    </script>
+{% endblock %}

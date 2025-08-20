@@ -11,6 +11,9 @@ urlpatterns = [
     path('team/', include('team.urls')),
     # 'role_distribution' 앱을 사용하지 않으므로 해당 URL 패턴도 제거합니다.
     # path('team/<uuid:team_id>/role/', include('role_distribution.urls')), 
+    path('role/', include('role_distribution.urls')), 
+
+    
 ]
 
 if settings.DEBUG:

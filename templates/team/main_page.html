@@ -15,19 +15,18 @@
                 <span class="team-name">{{ team.team_name }}</span>
             </div>
             <div class="header-actions">
-                <!-- D-Day 표시 영역을 공유 버튼 옆으로 이동 -->
                 <div class="d-day-badge">
                     <span id="d-day-text">D-Day</span>
                 </div>
-                <button class="share-button-bg">
+                <button class="share-button-bg" id="share-link-button">
                     <i class="fas fa-link"></i>
                 </button>
             </div>
         </header>
 
         <div class="progress-bar-container">
-            <div class="progress-bar" style="width: 0%;"></div>
-            <span class="progress-text">0%</span>
+            <div class="progress-bar" id="progress-bar" style="width: 0%;"></div>
+            <span class="progress-text" id="progress-text">0%</span>
         </div>
 
         <div class="member-list-container">
@@ -58,10 +57,9 @@
             </a>
         </div>
 
-        <!-- 새로운 버튼 레이아웃 -->
         <div class="button-grid-new">
-            <a href="{% url 'todo_list:list' team_token=team.team_id %}" class="grid-button">To-Do list</a>
-            <button class="grid-button">역할 정하기</button>
+            <a href="{% url 'role_distribution:role_page' team_id=team.team_id %}" class="grid-button">역할 정하기</a>
+            <button class="grid-button">To-Do list</button>
             <button class="grid-button">링크 모음</button>
         </div>
         <div class="start-new-team-button-container">
@@ -80,7 +78,6 @@
             transform: translateY(-2px);
         }
 
-        /* 새로운 버튼 레이아웃 스타일 */
         .button-grid-new {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -150,7 +147,7 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 10px; /* D-Day와 공유 버튼 사이 간격 */
+            gap: 10px;
         }
     </style>
 {% endblock %}
@@ -158,12 +155,11 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const shareButton = document.querySelector('.share-button-bg');
+        const shareButton = document.getElementById('share-link-button');
         if (shareButton) {
             shareButton.addEventListener('click', function() {
                 const urlToCopy = window.location.href;
                 
-                // 클립보드에 URL 복사
                 navigator.clipboard.writeText(urlToCopy).then(function() {
                     alert('팀플 링크가 복사되었습니다!');
                 }).catch(function(err) {
@@ -173,24 +169,42 @@
             });
         }
 
-        // D-Day 계산 및 표시
-        const deadlineDate = '{{ team.deadline_date|date:"Y-m-d" }}';
-        const deadlineTime = '{{ team.deadline_time|time:"H:i" }}';
-
-        if (deadlineDate && deadlineTime) {
-            const deadline = new Date(`${deadlineDate}T${deadlineTime}`);
+        // D-Day 및 진행도 계산 및 표시
+        const deadlineDateStr = '{{ team.deadline_date|date:"Y-m-d" }}';
+        const deadlineTimeStr = '{{ team.deadline_time|time:"H:i" }}';
+        
+        const dDayTextEl = document.getElementById('d-day-text');
+        const progressBarEl = document.getElementById('progress-bar');
+        const progressTextEl = document.getElementById('progress-text');
+        
+        if (deadlineDateStr) {
+            const deadline = new Date(`${deadlineDateStr}T${deadlineTimeStr}`);
             const today = new Date();
             const timeDiff = deadline.getTime() - today.getTime();
             const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
             
-            const dDayText = document.getElementById('d-day-text');
             if (daysDiff === 0) {
-                dDayText.textContent = 'D-Day';
+                dDayTextEl.textContent = 'D-Day';
             } else if (daysDiff > 0) {
-                dDayText.textContent = `D-${daysDiff}`;
+                dDayTextEl.textContent = `D-${daysDiff}`;
             } else {
-                dDayText.textContent = `D+${Math.abs(daysDiff)}`;
+                dDayTextEl.textContent = `D+${Math.abs(daysDiff)}`;
             }
+            
+            // 진행도 계산 (단, 시작일이 있어야 함)
+            // 현재 시작일 데이터가 없으므로 마감일만으로 간단하게 처리
+            // 실제 서비스에서는 팀 생성 시 시작일도 함께 저장해야 정확합니다.
+            const totalDays = 100; // 임의의 전체 기간 설정
+            const elapsedDays = totalDays - daysDiff;
+            const progress = Math.max(0, Math.min(100, (elapsedDays / totalDays) * 100));
+
+            progressBarEl.style.width = `${progress}%`;
+            progressTextEl.textContent = `${Math.round(progress)}%`;
+
+        } else {
+            dDayTextEl.textContent = '마감일 미설정';
+            progressBarEl.style.width = '0%';
+            progressTextEl.textContent = '0%';
         }
     });
 </script>

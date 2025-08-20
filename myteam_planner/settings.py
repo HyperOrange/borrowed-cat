@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'team',  # team 앱 추가
     'todo_list', # todo_list 앱을 다시 추가합니다.
     # 'role_distribution', # 이 부분을 제거합니다.
+    'role_distribution', # <-- 이 부분을 추가하세요
+
 ]
 
 MIDDLEWARE = [
