@@ -7,10 +7,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
-    path('todo/', include('todo_list.urls')), # todo_list 앱의 URL 패턴을 유지합니다.
+    path('todo/', include('todo_list.urls')),
     path('team/', include('team.urls')),
-    # 'role_distribution' 앱을 사용하지 않으므로 해당 URL 패턴도 제거합니다.
-    # path('team/<uuid:team_id>/role/', include('role_distribution.urls')), 
+    path('role/', include(('role_distribution.urls', 'role_distribution'), namespace='role_distribution')), 
 ]
 
 if settings.DEBUG:

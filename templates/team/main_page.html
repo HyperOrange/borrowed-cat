@@ -63,7 +63,7 @@
         <!-- 새로운 버튼 레이아웃 -->
         <div class="button-grid-new">
             <a href="{% url 'todo_list:list' team_token=team.team_id %}" class="grid-button">To-Do list</a>
-            <button class="grid-button">역할 정하기</button>
+            <a href="{% url 'role_distribution:role_page' team_id=team.team_id %}" class="grid-button">역할 정하기</a>
             <button class="grid-button">링크 모음</button>
         </div>
         <div class="start-new-team-button-container">
