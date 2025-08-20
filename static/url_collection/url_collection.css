@@ -1,0 +1,98 @@
+/* 컨테이너 */
+.urlc-container {
+  padding: 20px;
+  text-align: center;
+}
+
+/* 헤더 */
+.urlc-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.back-btn {
+  text-decoration: none;
+  font-size: 24px;
+  margin-right: 10px;
+  color: black;
+}
+.header-title {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* 상단 버튼 */
+.urlc-top-btn {
+  margin: 15px 0;
+}
+.main-btn {
+  background: #FFD633;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 30px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* 고양이 */
+.urlc-cat img {
+  width: 120px;
+  margin: 20px 0;
+}
+
+/* 구분선 */
+.urlc-divider {
+  height: 12px;
+  background: #FFD633;
+  border-radius: 8px;
+  margin: 15px 0;
+}
+
+/* 카드 그리드 */
+.urlc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* 카드 */
+.urlc-card {
+  position: relative;
+  background: #FFF7E6;
+  border-radius: 12px;
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.urlc-card img.favicon {
+  width: 60px;
+  height: 60px;
+}
+.delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 12px;
+  background: none;
+  border: none;
+  color: gray;
+  cursor: pointer;
+}
+
+/* 추가 버튼 */
+.add-card {
+  background: #FFFAF0;
+}
+.add-card a {
+  font-size: 40px;
+  text-decoration: none;
+  color: gray;
+}
+
+/* 빈 상태 텍스트 */
+.empty-text {
+  grid-column: span 2;
+  color: gray;
+}

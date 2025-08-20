@@ -59,7 +59,21 @@
             <button class="grid-button">역할 설정하기</button>
             <button class="grid-button">D-day</button>
             <button class="grid-button">when2meet</button>
-            <button class="grid-button">링크 모음</button>
+            <a href="{% url 'url_collection:url_collection_page' team_id=team.team_id %}">
+                <button class="grid-button">링크 모음</button>
+            </a>
         </div>
     </div>
+
+    <!-- ✅ 아래는 제가 드린 팀 이름/팀원 목록 확인용 -->
+    <hr>
+    <h1>{{ team.team_name }} 메인 페이지</h1>
+    <h3>팀원 목록</h3>
+    <ul>
+      {% for member in members %}
+        <li>{{ member.nickname }} ({{ member.tags }})</li>
+      {% empty %}
+        <li>팀원이 아직 없습니다.</li>
+      {% endfor %}
+    </ul>
 {% endblock %}

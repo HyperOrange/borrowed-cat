@@ -16,6 +16,9 @@ def create_team(request):
             return redirect('core:set_deadline')
     return render(request, 'core/create_team.html')
 
+def url_collection(request):
+    return render(request, "url_collection/url_collection.html")
+
 # 마감일 설정 페이지
 def set_deadline(request):
     team_id = request.session.get('team_id')

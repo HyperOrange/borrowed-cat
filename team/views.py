@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Team, TeamMember
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
+from .models import Team, TeamMember
 
 def add_member(request, team_id):
     team = get_object_or_404(Team, team_id=team_id)
@@ -17,10 +17,20 @@ def add_member(request, team_id):
                 profile_image=profile_image,
                 tags=tags,
             )
-            # 팀원 추가 후 메인 페이지로 리다이렉트
-            return redirect(reverse('core:main_page', kwargs={'team_id': team.team_id}))
+            return redirect(reverse('team:main_page', kwargs={'team_id': team.team_id}))
     
     context = {
         'team_id': team.team_id,
     }
     return render(request, 'team/profile_settings.html', context)
+
+
+# 🔥 팀 메인 페이지 뷰
+def main_page(request, team_id):
+    team = get_object_or_404(Team, team_id=team_id)
+    members = TeamMember.objects.filter(team=team)
+    context = {
+        'team': team,
+        'members': members,
+    }
+    return render(request, 'team/main_page.html', context)

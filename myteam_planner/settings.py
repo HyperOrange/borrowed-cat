@@ -38,10 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',  # core 앱 추가
-    'team',  # team 앱 추가
-    'todo_list', # todo_list 앱 추가
+    'core',        # core 앱 추가
+    'team',        # team 앱 추가
+    'todo_list',   # todo_list 앱 추가
+    'url_collection',  # url_collection 앱 추가
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
