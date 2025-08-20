@@ -1,22 +1,32 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="container" style="max-width:480px; margin:0 auto;">
-  <header style="display:flex; align-items:center; gap:8px; padding:12px 0;">
-    <a href="{% url 'todo:list' team.team_id %}">←</a>
-    <h1 style="font-size:18px; margin:0;">할 일 수정</h1>
-  </header>
+  <div class="container" style="max-width:480px; margin:0 auto;">
 
-  <form method="post" style="display:flex; flex-direction:column; gap:12px;">
-    {% csrf_token %}
-    <label>제목 {{ form.title }}</label>
-    <label>마감기한 {{ form.due_at }}</label>
-    <label>담당자 {{ form.assignee }}</label>
-    <label>메모 {{ form.notes }}</label>
+    <header style="display:flex; align-items:center; gap:8px; padding:12px 0;">
+      <a href="{% url 'todo_list:list' team.team_id %}">←</a>
+      <h1 style="font-size:18px; margin:0;">할 일 수정</h1>
+    </header>
 
-    <div style="display:flex; gap:8px;">
-      <button type="submit" style="flex:1; padding:12px; background:#FFD24C; border:none; border-radius:10px; font-weight:700;">수정</button>
-      <a href="{% url 'todo:list' team.team_id %}" style="flex:1; padding:12px; text-align:center; background:#eee; border-radius:10px; text-decoration:none;">취소</a>
-    </div>
-  </form>
-</div>
+    <form method="post" style="display:flex; flex-direction:column; gap:12px;">
+      {% csrf_token %}
+
+      <label>제목 {{ form.title }}</label>
+      <label>마감기한 {{ form.due_at }}</label>
+      <label>담당자 {{ form.assignee }}</label>
+      <label>메모 {{ form.notes }}</label>
+
+      <div style="display:flex; gap:8px;">
+        <button type="submit"
+                style="flex:1; padding:12px; background:#FFD24C; border:none; border-radius:10px; font-weight:700;">
+          수정
+        </button>
+
+        <a href="{% url 'todo_list:list' team.team_id %}"
+           style="flex:1; padding:12px; text-align:center; background:#eee; border-radius:10px; text-decoration:none;">
+          취소
+        </a>
+      </div>
+    </form>
+  </div>
 {% endblock %}
