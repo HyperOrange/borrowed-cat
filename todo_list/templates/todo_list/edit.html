@@ -1,32 +1,236 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="container" style="max-width:480px; margin:0 auto;">
+<style>
+/* Mobile-optimized Todo List Design */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-    <header style="display:flex; align-items:center; gap:8px; padding:12px 0;">
-      <a href="{% url 'todo_list:list' team.team_id %}">←</a>
-      <h1 style="font-size:18px; margin:0;">할 일 수정</h1>
-    </header>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: rgba(245, 245, 245, 1);
+    min-height: 100vh;
+    padding: 0;
+}
 
-    <form method="post" style="display:flex; flex-direction:column; gap:12px;">
-      {% csrf_token %}
+.container {
+    max-width: 100%;
+    margin: 0;
+    background: rgba(245, 245, 245, 1);
+    min-height: 100vh;
+}
 
-      <label>제목 {{ form.title }}</label>
-      <label>마감기한 {{ form.due_at }}</label>
-      <label>담당자 {{ form.assignee }}</label>
-      <label>메모 {{ form.notes }}</label>
+.header {
+    background: rgba(245, 245, 245, 1);
+    padding: 15px 20px;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
 
-      <div style="display:flex; gap:8px;">
-        <button type="submit"
-                style="flex:1; padding:12px; background:#FFD24C; border:none; border-radius:10px; font-weight:700;">
-          수정
-        </button>
+.header-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-        <a href="{% url 'todo_list:list' team.team_id %}"
-           style="flex:1; padding:12px; text-align:center; background:#eee; border-radius:10px; text-decoration:none;">
-          취소
-        </a>
-      </div>
-    </form>
-  </div>
+.back-button {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #333;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.back-button:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+    text-shadow: none;
+}
+
+.content {
+    padding: 15px;
+}
+
+.form-section {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-section > div {
+    margin-bottom: 15px;
+}
+
+.form-section > div:last-child {
+    margin-bottom: 0;
+}
+
+label {
+    display: block;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+input[type="text"],
+input[type="datetime-local"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid rgba(200, 200, 200, 0.8);
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+input[type="text"]:focus,
+input[type="datetime-local"]:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #FFC107;
+    box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.2);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+button[type="submit"] {
+    background: #FFC107;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+}
+
+button[type="submit"]:hover {
+    background: #ffb300;
+    transform: translateY(-1px);
+}
+
+.btn-cancel {
+    background: #eee;
+    color: #333;
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+    text-align: center;
+    display: inline-block;
+}
+
+.btn-cancel:hover {
+    background: #ddd;
+    transform: translateY(-1px);
+}
+
+.button-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 12px 15px;
+    }
+
+    .content {
+        padding: 12px;
+    }
+
+    h1 {
+        font-size: 16px;
+    }
+
+    .back-button {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+    }
+
+    .form-section {
+        padding: 12px;
+    }
+}
+</style>
+
+<div class="container" style="max-width:480px; margin:0 auto;">
+    <div class="header">
+        <a href="{% url 'todo_list:list' team.team_id %}" class="back-button">‹</a>
+        <div class="header-content">
+            <h1>할 일 수정</h1>
+        </div>
+    </div>
+
+    <div class="content">
+        <form class="form-section" method="post">
+            {% csrf_token %}
+
+            <div>
+                <label for="{{ form.title.id_for_label }}">제목</label>
+                {{ form.title }}
+            </div>
+
+            <div>
+                <label for="{{ form.due_at.id_for_label }}">마감기한</label>
+                {{ form.due_at }}
+            </div>
+
+            <div>
+                <label for="{{ form.assignee.id_for_label }}">담당자</label>
+                {{ form.assignee }}
+            </div>
+
+            <div>
+                <label for="{{ form.notes.id_for_label }}">메모</label>
+                {{ form.notes }}
+            </div>
+
+            <div class="button-group">
+                <button type="submit">수정</button>
+                <a href="{% url 'todo_list:list' team.team_id %}" class="btn-cancel">취소</a>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
