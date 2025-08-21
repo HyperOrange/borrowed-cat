@@ -61,7 +61,6 @@
         }
 
 
-        /* 변경: 개별 팀원 아이템을 클릭 가능하도록 스타일을 추가 */
         .assignment-item {
             display: flex;
             align-items: center;
@@ -71,7 +70,7 @@
             border-radius: 15px;
             margin-bottom: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            cursor: pointer; /* 클릭 가능한 요소임을 나타냄 */
+            cursor: pointer;
             transition: transform 0.2s ease;
         }
 
@@ -109,7 +108,6 @@
             font-weight: 500;
         }
         
-        /* 변경: 여러 역할이 표시될 수 있도록 flex-wrap을 적용 */
         .assigned-roles-container {
             display: flex;
             flex-wrap: wrap;
@@ -144,6 +142,16 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
+        /* 변경: AI 버튼 스타일 추가 */
+        .ai-assign-btn {
+            background: linear-gradient(135deg, #1d9d74 0%, #157b5c 100%);
+            color: white;
+        }
+
+        .ai-assign-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29, 157, 116, 0.4);
+        }
 
         .random-assign-btn {
             background: linear-gradient(135deg, #f4c043 0%, #f1b02a 100%);
@@ -391,12 +399,10 @@
 
         <div class="member-assignment-list">
             {% for member in members_with_roles %}
-            <!-- 변경: 개별 역할 할당을 위해 data-member-id를 추가하고, on_click 이벤트를 추가 -->
             <div class="assignment-item" data-member-id="{{ member.id }}" data-member-nickname="{{ member.nickname }}">
                 <img src="{% static 'img/' %}{{ member.profile_image }}" alt="{{ member.nickname }}" class="member-profile-img">
                 <div class="member-info">
                     <span class="member-nickname">{{ member.nickname }}</span>
-                    <!-- 변경: 역할이 여러 개일 수 있으므로 컨테이너를 사용 -->
                     <span class="member-role" id="role-{{ member.id }}">
                         {% if member.roles %}
                             <div class="assigned-roles-container">
@@ -417,13 +423,15 @@
 
 
         <div class="bottom-button-group">
+            <button class="bottom-button ai-assign-btn" id="ai-assign-btn">
+                AI로 역할 정하기
+            </button>
             <button class="bottom-button random-assign-btn" id="open-modal-btn">
-                역할 정하기
+                역할 정하기 (수동/랜덤)
             </button>
         </div>
     </div>
     
-    <!-- 전체 랜덤 배정 모달 -->
     <div class="modal" id="assign-modal">
         <div class="modal-content">
             <button class="close-btn" id="close-modal-btn">&times;</button>
@@ -470,7 +478,6 @@
         </div>
     </div>
 
-    <!-- 변경: 개별 역할 선택을 위한 새로운 모달 추가 -->
     <div class="modal" id="single-assign-modal">
         <div class="modal-content">
             <button class="close-btn" id="close-single-modal-btn">&times;</button>
@@ -508,44 +515,37 @@
 {% block scripts %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // CSRF 토큰을 가져옵니다.
             const CSRF_TOKEN = document.querySelector('[name=csrfmiddlewaretoken]').value;
             
-            // 전체 랜덤 배정 모달 제어
             const openModalBtn = document.getElementById('open-modal-btn');
             const closeModalBtn = document.getElementById('close-modal-btn');
             const assignModal = document.getElementById('assign-modal');
-            
-            // 개별 역할 선택 모달 제어
             const singleAssignModal = document.getElementById('single-assign-modal');
             const closeSingleModalBtn = document.getElementById('close-single-modal-btn');
             const singleAssignForm = document.getElementById('single-assign-form');
             const singleAssignMemberName = document.getElementById('single-assign-member-name');
             const singleAssignMemberIdInput = document.getElementById('single-assign-member-id');
             const singleRoleListContainer = document.getElementById('single-role-list');
-
             const loadingModal = document.getElementById('loading-modal');
+            const aiAssignBtn = document.getElementById('ai-assign-btn'); // AI 버튼 추가
 
-            // 전체 역할 정하기 버튼 클릭 시 모달 열기
+
             openModalBtn.addEventListener('click', () => {
                 assignModal.style.display = 'flex';
             });
 
 
-            // 전체 역할 정하기 모달 닫기
             closeModalBtn.addEventListener('click', () => {
                 assignModal.style.display = 'none';
             });
 
 
-            // 전체 모달 외부 클릭 시 모달 닫기
             window.addEventListener('click', (event) => {
                 if (event.target === assignModal) {
                     assignModal.style.display = 'none';
                 }
             });
 
-            // 변경: 개별 팀원 아이템 클릭 이벤트 리스너
             document.querySelectorAll('.assignment-item').forEach(item => {
                 item.addEventListener('click', () => {
                     const memberId = item.dataset.memberId;
@@ -554,22 +554,18 @@
                     singleAssignMemberIdInput.value = memberId;
                     singleAssignMemberName.textContent = memberNickname;
                     
-                    // 개별 역할 선택 모달을 엽니다.
                     singleAssignModal.style.display = 'flex';
 
-                    // 선택된 역할을 초기화합니다.
                     document.querySelectorAll('#single-role-list .role-tag').forEach(tag => {
                         tag.classList.remove('selected');
                     });
                 });
             });
 
-            // 개별 역할 선택 모달 닫기
             closeSingleModalBtn.addEventListener('click', () => {
                 singleAssignModal.style.display = 'none';
             });
             
-            // 개별 모달 외부 클릭 시 모달 닫기
             window.addEventListener('click', (event) => {
                 if (event.target === singleAssignModal) {
                     singleAssignModal.style.display = 'none';
@@ -577,7 +573,6 @@
             });
 
 
-            // 라디오 버튼 그룹
             const radioGroups = document.querySelectorAll('.radio-group');
             radioGroups.forEach(group => {
                 group.addEventListener('click', (event) => {
@@ -595,7 +590,6 @@
                 });
             });
             
-            // 역할 태그 선택
             const roleListContainer = document.getElementById('role-list');
             roleListContainer.addEventListener('click', (event) => {
                 const tag = event.target.closest('.role-tag');
@@ -604,17 +598,14 @@
                 }
             });
             
-            // 변경: 개별 역할 모달의 역할 태그 선택
             singleRoleListContainer.addEventListener('click', (event) => {
                 const tag = event.target.closest('.role-tag');
                 if (tag) {
-                    // 개별 할당은 하나의 역할만 선택 가능하도록 기존 선택을 모두 해제합니다.
                     document.querySelectorAll('#single-role-list .role-tag').forEach(t => t.classList.remove('selected'));
                     tag.classList.add('selected');
                 }
             });
 
-            // 새로운 역할 추가
             const addRoleBtn = document.getElementById('add-role-btn');
             const newRoleInput = document.getElementById('new-role-input');
             
@@ -631,7 +622,6 @@
             });
 
 
-            // 전체 랜덤 배정 폼 제출 (AJAX)
             document.getElementById('assign-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
@@ -671,26 +661,7 @@
 
                     if (result.success) {
                         alert(result.message);
-                        
-                        const members = document.querySelectorAll('.assignment-item');
-                        const updatedAssignments = result.assignments;
-                        
-                        members.forEach(item => {
-                            const memberId = item.dataset.memberId;
-                            const roleSpan = document.getElementById(`role-${memberId}`);
-                            
-                            // 변경: 여러 역할을 표시하기 위해 HTML을 동적으로 생성
-                            if (updatedAssignments[memberId] && updatedAssignments[memberId].length > 0) {
-                                let roleHtml = '<div class="assigned-roles-container">';
-                                updatedAssignments[memberId].forEach(role => {
-                                    roleHtml += `<span class="assigned-role">${role}</span>`;
-                                });
-                                roleHtml += '</div>';
-                                roleSpan.innerHTML = roleHtml;
-                            } else {
-                                roleSpan.innerHTML = `역할 미정`;
-                            }
-                        });
+                        updateAssignments(result.assignments);
                     } else {
                         alert('역할 배정 실패: ' + result.message);
                     }
@@ -701,7 +672,6 @@
                 }
             });
 
-            // 변경: 개별 역할 할당 폼 제출 (AJAX)
             singleAssignForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
@@ -736,9 +706,7 @@
 
                     if (result.success) {
                         alert(result.message);
-                        
-                        const roleSpan = document.getElementById(`role-${result.member_id}`);
-                        roleSpan.innerHTML = `<span class="assigned-role">${result.role_name}</span>`;
+                        updateSingleAssignment(result.member_id, result.role_name);
                     } else {
                         alert('역할 할당 실패: ' + result.message);
                     }
@@ -748,6 +716,74 @@
                     alert('네트워크 오류가 발생했습니다.');
                 }
             });
+
+            // AI 역할 배정 버튼 클릭 이벤트
+            aiAssignBtn.addEventListener('click', async () => {
+                const teamId = '{{ team.team_id }}';
+                
+                // 팀원 데이터 (키워드를 포함)를 가져와야 합니다.
+                // 이 예시에서는 DB에서 키워드 정보를 가져올 수 있다고 가정합니다.
+                const membersWithKeywords = [
+                    { id: '{{ members_with_roles.0.id }}', nickname: '{{ members_with_roles.0.nickname }}', keywords: '리더십,발표력' },
+                    { id: '{{ members_with_roles.1.id }}', nickname: '{{ members_with_roles.1.nickname }}', keywords: '준비성,긍정적 마인드' },
+                    { id: '{{ members_with_roles.2.id }}', nickname: '{{ members_with_roles.2.nickname }}', keywords: '열정,끈기' },
+                    { id: '{{ members_with_roles.3.id }}', nickname: '{{ members_with_roles.3.nickname }}', keywords: '논리적 사고,소통' },
+                ];
+                
+                // AI 역할 배정 API를 호출합니다.
+                try {
+                    loadingModal.style.display = 'flex';
+                    const response = await fetch(`{% url 'role_distribution:ai_assign' team_id=team.team_id %}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': CSRF_TOKEN
+                        },
+                        body: JSON.stringify({ team_members_data: membersWithKeywords })
+                    });
+                    
+                    const result = await response.json();
+                    loadingModal.style.display = 'none';
+                    
+                    if (result.success) {
+                        alert(result.message);
+                        updateAssignments(result.assignments);
+                    } else {
+                        alert('AI 역할 배정 실패: ' + result.message);
+                    }
+                } catch (error) {
+                    loadingModal.style.display = 'none';
+                    console.error('Error:', error);
+                    alert('네트워크 오류가 발생했습니다.');
+                }
+            });
+
+            // 역할 할당 UI 업데이트 함수
+            function updateAssignments(updatedAssignments) {
+                const members = document.querySelectorAll('.assignment-item');
+                members.forEach(item => {
+                    const memberId = item.dataset.memberId;
+                    const roleSpan = document.getElementById(`role-${memberId}`);
+                    
+                    if (updatedAssignments[memberId] && updatedAssignments[memberId].length > 0) {
+                        let roleHtml = '<div class="assigned-roles-container">';
+                        updatedAssignments[memberId].forEach(role => {
+                            roleHtml += `<span class="assigned-role">${role}</span>`;
+                        });
+                        roleHtml += '</div>';
+                        roleSpan.innerHTML = roleHtml;
+                    } else {
+                        roleSpan.innerHTML = `역할 미정`;
+                    }
+                });
+            }
+
+            // 개별 역할 할당 UI 업데이트 함수
+            function updateSingleAssignment(memberId, roleName) {
+                const roleSpan = document.getElementById(`role-${memberId}`);
+                roleSpan.innerHTML = `<span class="assigned-role">${roleName}</span>`;
+            }
+
         });
     </script>
 {% endblock %}

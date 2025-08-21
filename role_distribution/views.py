@@ -169,3 +169,94 @@ def assign_single_role(request, team_id):
             return JsonResponse({'success': False, 'message': f'오류 발생: {e}'}, status=400)
     
     return JsonResponse({'success': False, 'message': '잘못된 접근입니다.'}, status=405)
+
+# 아래는 새로운 import
+import requests
+import json
+import base64
+
+# Gemini API의 엔드포인트와 키를 상수로 정의합니다.
+API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key="
+API_KEY = "" # API 키는 별도로 설정해야 합니다.
+
+
+# 변경: AI 기반 역할 배정 API 뷰를 추가
+def ai_assign_roles(request, team_id):
+    if request.method == 'POST':
+        try:
+            team = get_object_or_404(Team, team_id=team_id)
+            
+            # 클라이언트에서 보낸 키워드 데이터를 파싱합니다.
+            data = json.loads(request.body)
+            team_members_data = data.get('team_members_data', [])
+
+            if not team_members_data:
+                return JsonResponse({'success': False, 'message': '팀원 키워드 데이터가 없습니다.'})
+
+            # AI에 보낼 프롬프트 생성
+            prompt = "다음 팀원들의 키워드를 분석하여 각각에게 가장 어울리는 역할을 한 가지씩 추천해줘. 역할은 '발표', '자료정리', '자료조사', '발표자료 제작', '백피피티 제작', '보고서 작성', '팀장' 중에서 선택해. 응답은 JSON 형식으로 부탁해. 예시: [{'member_id': 'uuid', 'role': '역할이름'}]"
+            
+            for member in team_members_data:
+                prompt += f"\n- {member['nickname']}의 키워드: {member['keywords']}"
+            
+            # API 호출을 위한 페이로드 구성
+            payload = {
+                "contents": [
+                    {
+                        "role": "user",
+                        "parts": [
+                            {"text": prompt}
+                        ]
+                    }
+                ],
+                "generationConfig": {
+                    "responseMimeType": "application/json"
+                }
+            }
+
+            headers = {
+                "Content-Type": "application/json"
+            }
+
+            # API 호출
+            response = requests.post(f"{API_URL}{API_KEY}", headers=headers, data=json.dumps(payload))
+            response.raise_for_status() # HTTP 오류가 발생하면 예외를 발생시킵니다.
+            
+            ai_assignments = response.json().get('candidates')[0]['content']['parts'][0]['text']
+            ai_assignments = json.loads(ai_assignments)
+
+            with transaction.atomic():
+                # 기존 할당을 모두 삭제합니다.
+                member_ids = [member['id'] for member in team_members_data]
+                RoleAssignment.objects.filter(team=team, member__id__in=member_ids).delete()
+
+                # AI가 제안한 역할로 할당을 생성합니다.
+                assignments_to_create = []
+                for assignment in ai_assignments:
+                    member = get_object_or_404(TeamMember, nickname=assignment['member_id'])  # member_id 값이 닉네임인 경우
+                    role, created = Role.objects.get_or_create(name=assignment['role'])
+                    assignments_to_create.append(RoleAssignment(team=team, member=member, role=role))
+                
+                RoleAssignment.objects.bulk_create(assignments_to_create)
+
+            updated_assignments = RoleAssignment.objects.filter(team=team).select_related('member', 'role')
+            updated_assignments_by_member = {}
+            for a in updated_assignments:
+                if a.member.id not in updated_assignments_by_member:
+                    updated_assignments_by_member[a.member.id] = []
+                updated_assignments_by_member[a.member.id].append(a.role.name)
+
+            return JsonResponse({
+                'success': True,
+                'message': 'AI가 역할 배정을 완료했습니다!',
+                'assignments': updated_assignments_by_member
+            })
+
+        except requests.RequestException as e:
+            return JsonResponse({'success': False, 'message': f'API 호출 중 오류 발생: {e}'}, status=500)
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'API 응답 형식이 올바르지 않습니다.'}, status=500)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'오류 발생: {e}'}, status=400)
+    
+    return JsonResponse({'success': False, 'message': '잘못된 접근입니다.'}, status=405)
