@@ -28,8 +28,8 @@
         </header>
 
         <div class="progress-bar-container">
-            <div class="progress-bar" id="progress-bar" style="width: {{ progress_percentage }}%;"></div>
-            <span class="progress-text" id="progress-text">{{ progress_percentage }}%</span>
+            <div class="progress-bar" id="progress-bar" style="width: {{ progress_percentage|default:'0' }}%;"></div>
+            <span class="progress-text" id="progress-text">{{ progress_percentage|default:"계산중.." }}%</span>
         </div>
 
 
@@ -101,7 +101,7 @@
             height: 100%;
             background: linear-gradient(90deg, #FFC107 0%, #FF9800 100%);
             border-radius: 15px;
-            transition: width 0.6s ease-in-out;
+            transition: width 0.3s ease-in-out;
             position: relative;
         }
 
