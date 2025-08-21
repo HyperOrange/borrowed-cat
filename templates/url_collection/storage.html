@@ -122,10 +122,10 @@
     </div>
     
     <!-- 데이터베이스에서 가져온 링크들을 동적으로 표시 -->
-    {% for link in links %}
-    <div class="card" onclick="openLink('{{ link.url }}')">
+    {% for url_item in urls %}
+    <div class="card" onclick="openLink('{{ url_item.url }}')">
       <span class="delete-btn" onclick="event.stopPropagation(); deleteCard(this)">삭제</span>
-      <img src="https://www.google.com/s2/favicons?domain={{ link.url }}" alt="{{ link.title }} 아이콘">
+      <img src="https://www.google.com/s2/favicons?domain={{ url_item.url }}&sz=64" alt="{{ url_item.title }} 아이콘">
     </div>
     {% endfor %}
 

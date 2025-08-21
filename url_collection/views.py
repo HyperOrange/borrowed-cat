@@ -1,52 +1,48 @@
-# myteam_planner/url_collection/views.py
-
 from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse, HttpResponse
-from team.models import Team
-from .models import Link # Link 모델 불러오기 추가
-import json # JSON 처리를 위해 import
-
-def storage_view(request, team_id):
-    """
-    '링크 모음' 페이지를 렌더링하는 뷰입니다.
-    데이터베이스에서 해당 팀의 링크 목록을 조회하여 템플릿에 전달합니다.
-    """
-    # team_id를 사용하여 Team 객체를 가져오고, 없으면 404 에러를 발생시킵니다.
-    team = get_object_or_404(Team, pk=team_id)
-    
-    # 데이터베이스에서 해당 팀의 모든 링크를 가져옵니다.
-    links = Link.objects.filter(team=team)
-    
-    context = {
-        'team': team,
-        'links': links,
-    }
-    
-    return render(request, 'url_collection/storage.html', context)
+from django.http import JsonResponse
+import json
+from .models import URLStorage
 
 def add_url_view(request, team_id):
-    """
-    링크 추가 페이지를 렌더링하고 POST 요청을 처리합니다.
-    """
     if request.method == 'POST':
         try:
-            data = json.loads(request.body.decode('utf-8'))
-            link_url = data.get('link_url')
-            link_title = data.get('link_title')
+            data = json.loads(request.body)
+            url = data.get('url')
             
-            # team_id를 사용하여 Team 객체를 가져옵니다.
-            team = get_object_or_404(Team, pk=team_id)
+            print(f"받은 URL: {url}")  # 디버그용
             
-            # Link 모델을 사용하여 데이터베이스에 링크를 저장합니다.
-            Link.objects.create(team=team, url=link_url, title=link_title)
+            if not url:
+                return JsonResponse({'success': False, 'error': 'URL이 필요합니다.'})
             
-            return JsonResponse({'success': True, 'message': '링크가 성공적으로 추가되었습니다.'})
-        except json.JSONDecodeError:
-            return JsonResponse({'success': False, 'message': '잘못된 JSON 형식입니다.'}, status=400)
-    else:
-        # GET 요청일 경우 HTML 페이지를 렌더링합니다.
-        team = get_object_or_404(Team, pk=team_id)
-        return render(request, 'url_collection/add_url.html', {'team': team})
+            # URL이 http:// 또는 https://로 시작하지 않으면 추가
+            if not url.startswith(('http://', 'https://')):
+                url = 'https://' + url
+            
+            # URLStorage 모델을 사용해서 저장
+            url_storage = URLStorage.objects.create(
+                team_id=str(team_id),  # UUID를 문자열로 변환
+                url=url,
+                title=url  # 일단 URL을 title로 사용
+            )
+            
+            print(f"URL 저장됨: {url_storage.id}")  # 디버그용
+            
+            return JsonResponse({'success': True})
+        except Exception as e:
+            print(f"에러 발생: {e}")  # 디버그용
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return render(request, 'url_collection/add_url.html', {'team': {'team_id': team_id}})
+
+def storage_view(request, team_id):
+    # 해당 team_id의 URL들을 불러옵니다.
+    urls = URLStorage.objects.filter(team_id=str(team_id)).order_by('-created_at')
+    
+    context = {
+        'team': {'team_id': team_id},
+        'urls': urls,
+    }
+    return render(request, 'url_collection/storage.html', context)
 
 def test_page(request):
     """

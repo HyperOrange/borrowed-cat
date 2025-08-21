@@ -1,13 +1,11 @@
-# myteam_planner/url_collection/models.py
-
 from django.db import models
-from team.models import Team # Team 모델 임포트
 
-class Link(models.Model):
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='links')
+class URLStorage(models.Model):
+    team_id = models.CharField(max_length=100)  # UUID를 문자열로 저장
     url = models.URLField()
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=200, blank=True)
+    favicon_url = models.URLField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.title
+        return f"Team {self.team_id} - {self.url}"

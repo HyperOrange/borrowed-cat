@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -134,7 +135,19 @@
       })
       .then(response => {
         console.log('Response status:', response.status);
-        return response.json();
+        console.log('Response headers:', response.headers);
+        
+        // 응답이 JSON인지 확인
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          return response.json();
+        } else {
+          // JSON이 아닌 경우 텍스트로 읽어서 로그 출력
+          return response.text().then(text => {
+            console.error('서버에서 HTML 응답을 받았습니다:', text);
+            throw new Error('서버에서 올바른 JSON 응답을 받지 못했습니다.');
+          });
+        }
       })
       .then(data => {
         console.log('Server response:', data);
@@ -149,7 +162,7 @@
       })
       .catch(error => {
         console.error('Error:', error);
-        alert("서버 오류가 발생했습니다.");
+        alert("서버 오류가 발생했습니다: " + error.message);
       });
     }
   </script>
