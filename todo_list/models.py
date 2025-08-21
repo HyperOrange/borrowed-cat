@@ -33,7 +33,7 @@ class ToDoItem(models.Model):
         ordering = ["is_done", "due_at", "-id"]
 
     def __str__(self):
-        return f"[{self.team_id}] {self.title}"
+        return f"[{self.team.team_id}] {self.title}"
 
     @property
     def dday(self):

@@ -15,6 +15,21 @@ class Team(models.Model):
     
     # 팀플 마감 시간을 저장하는 필드입니다.
     deadline_time = models.TimeField(null=True, blank=True)
+    def get_todo_progress(self):
+        """팀의 전체 Todo 진행률을 계산합니다."""
+        from todo_list.models import ToDoItem
+        
+        # 이 팀의 모든 todo 항목 가져오기
+        todos = ToDoItem.objects.filter(team=self)
+        total_count = todos.count()
+        
+        if total_count == 0:
+            return 0
+            
+        completed_count = todos.filter(is_done=True).count()
+        progress = (completed_count / total_count) * 100
+        
+        return round(progress, 1)
 
     # Django Admin 등에서 객체를 표시할 때 팀명으로 보여주도록 설정합니다.
     def __str__(self):
@@ -32,6 +47,9 @@ class TeamMember(models.Model):
 
     # 선택한 수식어들을 콤마로 구분하여 저장합니다.
     tags = models.CharField(max_length=255, blank=True, null=True)
+
+    
+
 
     # Django Admin 등에서 객체를 표시할 때 닉네임으로 보여주도록 설정합니다.
     def __str__(self):

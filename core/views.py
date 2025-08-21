@@ -59,7 +59,10 @@ def main_page(request, team_id):
     except:
         return redirect('core:index')
 
+    progress_percentage = team.get_todo_progress() # 팀의 To-Do 진행률을 가져옵니다.
+
     context = {
         'team': team
     }
     return render(request, 'team/main_page.html', context)
+

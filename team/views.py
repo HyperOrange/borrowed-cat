@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Team, TeamMember
 from django.urls import reverse
+from django.http import JsonResponse
 
 def add_member(request, team_id):
     team = get_object_or_404(Team, team_id=team_id)
@@ -49,3 +50,12 @@ def edit_member(request, team_id, member_id):
         'is_edit': True,
     }
     return render(request, 'team/profile_settings.html', context)
+
+def get_progress_ajax(request, team_id):
+    """AJAX로 프로그래스 업데이트를 위한 API 뷰"""
+    team = get_object_or_404(Team, team_id=team_id)
+    progress = team.get_todo_progress()
+    
+    return JsonResponse({
+        'progress': progress
+    })
