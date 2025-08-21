@@ -10,6 +10,7 @@ urlpatterns = [
     path('todo/', include('todo_list.urls')),
     path('team/', include('team.urls')),
     path('role/', include(('role_distribution.urls', 'role_distribution'), namespace='role_distribution')), 
+    path('url_collection/', include('url_collection.urls')),
 ]
 
 if settings.DEBUG:

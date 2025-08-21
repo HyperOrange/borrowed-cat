@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'team',  # team 앱 추가
     'todo_list', # todo_list 앱을 다시 추가합니다.
     'role_distribution',
+    'url_collection',
 ]
 
 MIDDLEWARE = [
