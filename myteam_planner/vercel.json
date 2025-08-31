@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "myteam_planner/wsgi.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "myteam_planner/wsgi.py"
+    }
+  ]
+}

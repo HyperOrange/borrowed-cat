@@ -32,6 +32,13 @@ ALLOWED_HOSTS = [
   '127.0.0.1'  # 개발용
 ]
 
+# Vercel에서 필요한 설정
+ALLOWED_HOSTS = ['*']  # 또는 실제 도메인 지정
+DEBUG = False  # 프로덕션에서는 False
+
+# 정적 파일 설정
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Application definition
 
