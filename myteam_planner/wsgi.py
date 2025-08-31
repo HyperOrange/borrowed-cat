@@ -10,9 +10,16 @@ https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/
 # myteam_planner/wsgi.py
 
 import os
+import sys
 from django.core.wsgi import get_wsgi_application
+
+# 프로젝트 경로를 Python path에 추가
+sys.path.append('/var/task')
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myteam_planner.settings')
 
 application = get_wsgi_application()
-app = application  # Vercel에서 인식하기 위해 추가
+
+# Vercel을 위한 핸들러
+def handler(request, context):
+    return application(request, context)
