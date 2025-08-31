@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}My Team Planner{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Vercel Speed Insights 스크립트를 여기에 추가하세요. -->
+    <script type="module">
+      import { injectSpeedInsights } from 'https://cdn.jsdelivr.net/npm/@vercel/speed-insights/dist/esm/index.js';
+      injectSpeedInsights();
+    </script>
     {% block head %}{% endblock %}
 </head>
 <body>
