@@ -175,9 +175,13 @@ import requests
 import json
 import base64
 
+
+# .env 파일에서 환경 변수를 불러옵니다.
+load_dotenv()
+
 # Gemini API의 엔드포인트와 키를 상수로 정의합니다.
 API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key="
-API_KEY = "" # API 키는 별도로 설정해야 합니다.
+API_KEY = os.getenv("API_KEY") # 환경 변수에서 API 키를 가져옵니다.
 
 
 # 변경: AI 기반 역할 배정 API 뷰를 추가
