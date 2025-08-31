@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-j*q!x*z2)g$z6&5^b-a!yq#*m2^h7x&y7z6&5^b-a!yq#*m2'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-  'borrowed-cat-five.vercel.app',
+  'borrowed-cat.vercel.app',
   '.vercel.app',
   '127.0.0.1'  # 개발용
 ]
